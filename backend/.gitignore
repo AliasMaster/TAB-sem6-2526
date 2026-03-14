@@ -1,0 +1,50 @@
+# === .NET Build Artifacts ===
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+[Oo]t/
+
+# === Visual Studio / VS Code ===
+.vs/
+.vscode/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+.vsconfig
+
+# === Docker ===
+.dockerignore
+# Ignorujemy dane bazy, jeśli zmapowałeś je do lokalnego folderu zamiast wolumenu
+# pgdata/ 
+
+# === OS specific ===
+.DS_Store
+Thumbs.db
+
+# === Tooling & Secrets ===
+# Ignoruj pliki z sekretami, jeśli będziesz ich używać lokalnie
+*.usersecrets
+appsettings.Development.json
+# Poniższe warto zostawić w repo, jeśli to projekt edukacyjny, 
+# ale w prodzie .env zawsze się ignoruje:
+# .env
+
+# === User-specific files ===
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# === Riders/JetBrains ===
+.idea/
+*.sln.iml
+
+.env
+
+pgdata/
+mongodb_data/

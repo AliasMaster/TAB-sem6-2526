@@ -1,0 +1,46 @@
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8
+end_of_line = lf
+
+[*.{cs,csx,vb,vbx}]
+# Style kodu C#
+dotnet_style_qualification_for_field = false:silent
+dotnet_style_qualification_for_property = false:silent
+dotnet_style_qualification_for_method = false:silent
+dotnet_style_qualification_for_event = false:silent
+
+# Reguły "Using"
+dotnet_separate_import_directive_groups = true
+dotnet_sort_system_directives_first = true
+csharp_using_directive_placement = outside_namespace:silent
+
+# Nowoczesny C# (C# 12/13)
+csharp_style_expression_bodied_methods = true:suggestion
+csharp_style_expression_bodied_constructors = false:silent
+csharp_style_expression_bodied_operators = true:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_expression_bodied_accessors = true:suggestion
+csharp_style_expression_bodied_lambdas = true:suggestion
+
+# Reguły formatowania (Nawiasy klamrowe)
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+
+# Reguły var (używaj var, gdy typ jest oczywisty)
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:silent
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+
+[*.{json,yml,yaml}]
+indent_size = 2
+
+[Dockerfile*]
+indent_size = 4

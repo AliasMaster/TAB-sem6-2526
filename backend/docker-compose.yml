@@ -1,0 +1,90 @@
+services:
+  database:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - posgres_data:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+    ports:
+      - "5672:5672" # AMQP port
+      - "15672:15672" # Management UI port
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  api-gateway:
+    build: ./src/Services/Api
+    container_name: api-gateway
+    ports:
+      - "80:8080"
+    depends_on:
+      - database
+      - order-service
+
+  auth-service:
+    build: ./src/Services/Auth
+    container_name: auth-service
+    environment:
+      DATABASE_URL: postgres://database/app_db
+    depends_on:
+      - database
+
+  order-service:
+    build: ./src/Services/Order
+    container_name: order-service
+    environment:
+      DATABASE_URL: postgres://database:5432/app_db
+      RABBITMQ_URL: amqp://rabbitmq
+    depends_on:
+      - database
+      - rabbitmq
+
+  catalog-service:
+    build: ./src/Services/Catalog
+    container_name: catalog-service
+    environment:
+      DATABASE_URL: postgres://database/app_db
+    depends_on:
+      - database
+
+  community-service:
+    build: ./src/Services/Community
+    container_name: community-service
+    environment:
+      DATABASE_URL: postgres://database/app_db
+      RABBITMQ_URL: amqp://rabbitmq
+    depends_on:
+      - database
+      - rabbitmq
+
+  report-service:
+    build: ./src/Services/Report
+    container_name: report-service
+    environment:
+      DATABASE_URL: postgres://database/app_db
+      RABBITMQ_URL: amqp://rabbitmq
+    depends_on:
+      - database
+      - rabbitmq
+
+  enrollment-service:
+    build: ./src/Services/Enrollment
+    container_name: enrollment-service
+    environment:
+      DATABASE_URL: postgres://database/app_db
+    depends_on:
+      - database
+
+volumes:
+  posgres_data:
+  rabbitmq_data:
