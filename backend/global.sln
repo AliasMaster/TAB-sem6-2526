@@ -16,19 +16,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Order", "Order", "{EA4397C4
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Report", "Report", "{618D016A-90E8-68C4-7401-506C477B638C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "Api\ApiGateway.csproj", "{48DFF97B-9A5F-EA97-093C-84C783EDB4CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "src\Services\Api\ApiGateway.csproj", "{48DFF97B-9A5F-EA97-093C-84C783EDB4CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService", "Auth\AuthService.csproj", "{CA06A9B6-C056-7687-2DB6-E7300D74346E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService", "src\Services\Auth\AuthService.csproj", "{CA06A9B6-C056-7687-2DB6-E7300D74346E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatalogService", "Catalog\CatalogService.csproj", "{A167B50E-8487-11DE-2D7A-364C5AA9AB6E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatalogService", "src\Services\Catalog\CatalogService.csproj", "{A167B50E-8487-11DE-2D7A-364C5AA9AB6E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityService", "Community\CommunityService.csproj", "{28DCDF32-909D-A6EA-054D-AE1A301D7D09}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityService", "src\Services\Community\CommunityService.csproj", "{28DCDF32-909D-A6EA-054D-AE1A301D7D09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnrollmentService", "Enrollment\EnrollmentService.csproj", "{A6330A73-B920-67F7-4AD8-B3B8BEF27910}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnrollmentService", "src\Services\Enrollment\EnrollmentService.csproj", "{A6330A73-B920-67F7-4AD8-B3B8BEF27910}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService", "Order\OrderService.csproj", "{0C1DE1C4-DE9F-BBD7-3495-0695DA9660C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService", "src\Services\Order\OrderService.csproj", "{0C1DE1C4-DE9F-BBD7-3495-0695DA9660C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReportService", "Report\ReportService.csproj", "{5195FA3E-3B8B-65B1-8573-17F4EAB1C1FC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReportService", "src\Services\Report\ReportService.csproj", "{5195FA3E-3B8B-65B1-8573-17F4EAB1C1FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
