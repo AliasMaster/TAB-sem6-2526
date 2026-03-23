@@ -1,10 +1,10 @@
-/* --- ZMIENNE KOLORYSTYCZNE --- */
+/* --- ZMIENNE I KONFIGURACJA --- */
 :root {
-  --primary: #1e293b;      /* Ciemny granat */
+  --primary: #1e293b;       /* Ciemny granat */
   --primary-light: #334155;
-  --accent: #f59e0b;       /* Złoty/Bursztynowy */
+  --accent: #f59e0b;        /* Złoty/Bursztynowy */
   --accent-hover: #d97706;
-  --bg-color: #f8fafc;     /* Bardzo jasny szary na tło */
+  --bg-color: #f8fafc;      /* Bardzo jasny szary tło */
   --text-dark: #0f172a;
   --text-muted: #64748b;
   --white: #ffffff;
@@ -25,13 +25,13 @@ body {
   line-height: 1.6;
 }
 
-/* Zapobiega poziomemu paskowi przewijania i pozwala na pełną szerokość */
+
 #root {
   width: 100%;
   overflow-x: hidden;
 }
 
-/* Kontener trzymający treść w ryzach na wielkich monitorach, ale tła mogą być na 100% */
+/* Kontener główny */
 .container {
   max-width: 1400px;
   margin: 0 auto;
@@ -97,6 +97,7 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   border: none;
+  display: inline-block;
 }
 
 .btn-login {
@@ -118,13 +119,30 @@ body {
   transform: translateY(-2px);
 }
 
-/* --- SEKCJA HERO (Strona Główna) --- */
+.btn-outline {
+  border: 2px solid var(--white);
+  color: var(--white);
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background: var(--white);
+  color: var(--primary);
+}
+
+/* --- SEKCJA HERO --- */
 .hero-section {
   background-color: var(--primary);
   color: var(--white);
   padding: 6rem 0;
-  text-align: center;
   border-bottom: 4px solid var(--primary-light);
+}
+
+.hero-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4rem;
 }
 
 .hero-title {
@@ -142,19 +160,39 @@ body {
   font-size: 1.2rem;
   color: #cbd5e1;
   max-width: 600px;
-  margin: 0 auto 3rem auto;
+  margin-bottom: 3rem;
 }
 
+.badge {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--accent);
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  display: inline-block;
+}
+
+.hero-btns {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Wyszukiwarka w Hero */
 .search-bar {
   display: flex;
-  max-width: 600px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 500px;
   gap: 0.5rem;
+  background: white;
+  padding: 5px;
+  border-radius: 50px;
 }
 
 .search-input {
   flex-grow: 1;
-  padding: 1rem 1.5rem;
+  padding: 0.8rem 1.5rem;
   border-radius: 50px;
   border: none;
   font-size: 1rem;
@@ -172,7 +210,33 @@ body {
   transition: 0.3s;
 }
 
-/* --- SIATKA KURSÓW I KARTY --- */
+/* --- STATYSTYKI --- */
+.stats-section {
+  padding: 4rem 0;
+  background-color: var(--white);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.dark-stats {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  text-align: center;
+}
+
+.stat-item h3 {
+  font-size: 2.5rem;
+  color: var(--accent);
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+/* --- KARTY KURSÓW --- */
 .courses-section {
   padding: 5rem 0;
 }
@@ -235,25 +299,10 @@ body {
   flex-grow: 1;
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-}
-
 .card-title {
   font-size: 1.3rem;
   margin-bottom: 1rem;
   color: var(--text-dark);
-}
-
-.card-description {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  margin-bottom: 2rem;
-  flex-grow: 1;
 }
 
 .card-footer {
@@ -262,6 +311,7 @@ body {
   align-items: center;
   border-top: 1px solid var(--border-color);
   padding-top: 1.5rem;
+  margin-top: auto;
 }
 
 .card-price {
@@ -270,72 +320,78 @@ body {
   color: var(--primary);
 }
 
-/* --- SZCZEGÓŁY KURSU (Hero i Opis) --- */
-.detail-hero {
-  background-color: var(--primary-light);
+
+.cta-box {
+  background: var(--primary);
+  padding: 4rem 2rem; 
+  border-radius: 30px;
   color: var(--white);
-  padding: 4rem 0;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  text-align: center; 
+  max-width: 1000px; 
+  margin: 0 auto;  
+  position: relative;
+  overflow: hidden;
 }
 
-.detail-hero-content {
-  display: flex;
-  gap: 4rem;
-  align-items: center;
+/* Efekt dekoracyjny wewnątrz boxa */
+.cta-box::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 300px;
+  height: 300px;
+  background: rgba(245, 158, 11, 0.1);
+  border-radius: 50%;
+  z-index: 0;
 }
 
-.detail-image {
-  width: 40%;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+.cta-box h2 {
+  position: relative;
+  z-index: 1;
+  color: var(--white);
+  font-size: clamp(2rem, 5vw, 3rem); 
+  margin-bottom: 1.5rem;
+  font-weight: 800;
 }
 
-.detail-info {
-  width: 60%;
+.cta-box p {
+  position: relative;
+  z-index: 1;
+  color: #cbd5e1;
+  font-size: 1.25rem;
+  max-width: 700px;
+  margin: 0 auto 2.5rem auto;
 }
 
-.detail-title {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-}
-
-.detail-price-section {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  margin-top: 2rem;
-}
-
-.detail-price {
-  font-size: 3rem;
-  font-weight: bold;
-  color: var(--accent);
-}
-
-/* --- PROGRAM KURSU --- */
-.syllabus-section {
-  padding: 4rem 0;
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 3rem;
-}
-
-.module {
-  margin-bottom: 2rem;
-}
-
-.module-title {
+.btn-large {
+  position: relative;
+  z-index: 1;
+  padding: 1.2rem 3.5rem;
   font-size: 1.2rem;
-  border-bottom: 2px solid var(--border-color);
-  padding-bottom: 0.5rem;
-  margin-bottom: 1rem;
+  background-color: var(--accent);
+  color: var(--primary);
+  border-radius: 50px;
+  box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3);
 }
 
-.lesson {
-  background: var(--white);
-  padding: 1rem 1.5rem;
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
-  border: 1px solid var(--border-color);
-  display: flex;
-  justify-content: space-between;
+.btn-large:hover {
+  background-color: var(--white);
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
 }
+
+/* Responsywność */
+
+@media (max-width: 992px) {
+  .hero-flex {
+    flex-direction: column;
+    text-align: center;
+  }
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+

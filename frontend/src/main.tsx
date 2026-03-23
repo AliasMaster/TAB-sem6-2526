@@ -1,7 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
-import './assets/styles/index.css' // lub Twoja ścieżka do CSS
+import './assets/styles/index.css' 
+
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

@@ -1,0 +1,114 @@
+/* --- KATALOG KURSÓW (katalog.css) --- */
+
+/* Nagłówek Katalogu - Spójny ze stroną główną */
+.catalog-header {
+  background-color: var(--primary); /* Ten sam ciemny granat */
+  color: var(--white);
+  padding: 5rem 0;
+  text-align: center;
+  border-bottom: 4px solid var(--primary-light);
+}
+
+.catalog-header h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+.catalog-header p {
+  color: #cbd5e1;
+  font-size: 1.1rem;
+}
+
+/* Kontrolki - Filtry i Search */
+.catalog-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: -2rem; /* Lekkie "wjechanie" na nagłówek dla efektu nowoczesności */
+  margin-bottom: 4rem;
+  gap: 1.5rem;
+  background: var(--white);
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+}
+
+/* Przycisk Filtrów */
+.filter-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-color);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  border-color: var(--accent);
+  color: var(--primary);
+}
+
+.filter-btn.active {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--primary);
+}
+
+/* Wyszukiwarka */
+.catalog-search {
+  flex: 1;
+  max-width: 400px;
+}
+
+.catalog-search input {
+  width: 100%;
+  padding: 0.75rem 1.2rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-color);
+  font-family: inherit;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.catalog-search input:focus {
+  border-color: var(--accent);
+  background: var(--white);
+}
+
+/* Informacja o wynikach */
+.results-info {
+  margin-bottom: 2rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.results-info span {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* Responsywność dla katalogu */
+@media (max-width: 992px) {
+  .catalog-controls {
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: 2rem;
+  }
+  
+  .catalog-search {
+    max-width: 100%;
+  }
+}
