@@ -1,0 +1,151 @@
+/* --- SZCZEGÓŁY KURSU (Hero i Opis) --- */
+.detail-hero {
+  background-color: var(--primary-light);
+  color: var(--white);
+  padding: 5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.detail-hero-content {
+  display: flex;
+  gap: 4rem;
+  align-items: center;
+}
+
+.detail-image {
+  width: 45%; /* Nieco większe dla balansu */
+  max-height: 400px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  object-fit: cover;
+}
+
+.detail-info {
+  width: 55%;
+}
+
+.detail-title {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  font-weight: 800;
+}
+
+.detail-price-section {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.detail-price {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+/* --- SEKCJA PROGRAMU (SYLLABUS) --- */
+.syllabus-section {
+  padding: 5rem 0;
+  display: grid;
+  grid-template-columns: 1.8fr 1.2fr; /* Proporcje lewa/prawa */
+  gap: 4rem;
+  align-items: start;
+}
+
+.syllabus-section h2 {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+}
+
+/* Karta Modułu */
+.module {
+  margin-bottom: 2rem;
+}
+
+.module:last-child {
+  margin-bottom: 0;
+}
+
+.module-title {
+  font-size: 1.1rem;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+/* Pojedyncza lekcja */
+.lesson {
+  background: var(--white);
+  padding: 1.2rem 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.lesson:hover {
+  border-color: var(--accent);
+  transform: translateX(5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.lesson span:first-child {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+/* --- RESPONSYWNOŚĆ --- */
+
+@media (max-width: 992px) {
+  .detail-hero-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .detail-image {
+    width: 80%;
+    margin-bottom: 2rem;
+  }
+
+  .detail-info {
+    width: 100%;
+  }
+
+  .detail-price-section {
+    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .syllabus-section {
+    grid-template-columns: 1fr; /* Jedna kolumna na tabletach/mobile */
+    gap: 3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .detail-image {
+    width: 100%;
+  }
+  
+  .detail-title {
+    font-size: 1.8rem;
+  }
+
+  .lesson {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
