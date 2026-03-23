@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 
 export default function Header() {
   return (
@@ -9,9 +9,19 @@ export default function Header() {
         </Link>
         
         <nav className="nav-links">
-          {}
-          <Link to="/katalog">Katalog Kursów</Link>
-          <Link to="/forum">Społeczność</Link>
+          {/* end sprawia, że strona główna jest aktywna TYLKO na ścieżce "/" */}
+          <NavLink to="/" end className={({ isActive }) => isActive ? 'active' : ''}>
+            Start
+          </NavLink>
+          <NavLink to="/katalog" className={({ isActive }) => isActive ? 'active' : ''}>
+            Katalog Kursów
+          </NavLink>
+          <NavLink to="/nauka" className={({ isActive }) => isActive ? 'active' : ''}>
+            Sekcja Nauki
+          </NavLink> 
+          <NavLink to="/forum" className={({ isActive }) => isActive ? 'active' : ''}>
+            Forum
+          </NavLink>
         </nav>
 
         <div className="auth-buttons">
