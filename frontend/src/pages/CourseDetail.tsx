@@ -24,7 +24,7 @@ export default function CourseDetailPage() {
             <div className="detail-price-section">
               <span className="detail-price">{course.price} zł</span>
               <button className="btn btn-primary" style={{fontSize: '1.2rem', padding: '1rem 3rem'}}>
-                Kup Kurs (F5)
+                Kup Kurs
               </button>
             </div>
           </div>
@@ -32,11 +32,37 @@ export default function CourseDetailPage() {
       </section>
 
       {/* Sekcja programu (F6 Materiały edukacyjne) */}
-      <section className="container syllabus-section">
-        <div>
-          <h2>O czym jest ten kurs?</h2>
-          <p style={{marginTop: '1rem', color: '#64748b'}}>Szczegółowy opis kursu ze specyfikacji...</p>
-        </div>
+     <section className="container syllabus-section">
+  {/* LEWA KOLUMNA: POPRAWIONY OPIS */}
+  <div className="description-container">
+  <span className="description-badge">Szczegóły Programu</span>
+  <h2>O czym jest ten kurs?</h2>
+  
+  <div className="description-content-wrapper">
+    <p className="description-text">
+      {course.longDescription || "Odkryj tajniki profesjonalnego podejścia, które odmieni Twój workflow. Ten program został stworzony z myślą o osobach, które nie szukają tylko suchych faktów, ale realnej transformacji swoich umiejętności. Każda minuta materiału to skoncentrowana wiedza praktyczna, poparta latami doświadczeń w najbardziej wymagających projektach rynkowych."}
+    </p>
+
+    <div className="feature-highlights">
+      <div className="feature-tag">
+        <div className="feature-icon">✓</div>
+        <span className="feature-text">Projekty Real-World</span>
+      </div>
+      <div className="feature-tag">
+        <div className="feature-icon">★</div>
+        <span className="feature-text">Certyfikat Premium</span>
+      </div>
+      <div className="feature-tag">
+        <div className="feature-icon">♾</div>
+        <span className="feature-text">Dożywotni Dostęp</span>
+      </div>
+      <div className="feature-tag">
+        <div className="feature-icon">🗂</div>
+        <span className="feature-text">Zasoby do pobrania</span>
+      </div>
+    </div>
+  </div>
+</div>
 
         <div style={{background: '#fff', padding: '2rem', borderRadius: '16px', border: '1px solid #e2e8f0'}}>
           <h3 style={{marginBottom: '1.5rem'}}>Program Kursu</h3>
@@ -58,3 +84,4 @@ export default function CourseDetailPage() {
     </div>
   );
 }
+
