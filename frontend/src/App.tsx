@@ -5,7 +5,7 @@ import CourseDetailPage from './pages/CourseDetail';
 
 function App() {
   return (
-    // WSZYSTKO co używa linków musi być wewnątrz BrowserRouter
+    // WSZYSTKO co używa linków musi być wewnątrz BrowserRouter....
     <BrowserRouter>
       <Header /> 
       
