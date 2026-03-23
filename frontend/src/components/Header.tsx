@@ -9,7 +9,8 @@ export default function Header() {
         </Link>
         
         <nav className="nav-links">
-          <Link to="/">Katalog Kursów</Link>
+          {}
+          <Link to="/katalog">Katalog Kursów</Link>
           <Link to="/forum">Społeczność</Link>
         </nav>
 
