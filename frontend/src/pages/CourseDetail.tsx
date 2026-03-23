@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { courses } from '../data';
+import '../assets/styles/coursedetail.css'; 
 
 export default function CourseDetailPage() {
   const { id } = useParams<{ id: string }>();
