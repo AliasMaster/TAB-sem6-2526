@@ -13,11 +13,6 @@ export default function HomePage() {
           <p className="hero-subtitle">
             Odkryj tysiące kursów programowania, designu i biznesu. Zacznij naukę już dziś.
           </p>
-          
-          <div className="search-bar">
-            <input type="text" placeholder="Czego chcesz się dziś nauczyć?" className="search-input" />
-            <button className="search-btn">Szukaj</button>
-          </div>
         </div>
       </section>
 

@@ -5,7 +5,7 @@ import CourseDetailPage from './pages/CourseDetail';
 
 function App() {
   return (
-    // WSZYSTKO co używa linków musi być wewnątrz BrowserRouter......
+    
     <BrowserRouter>
       <Header /> 
       
@@ -16,7 +16,7 @@ function App() {
         </Routes>
       </main>
 
-      {/* Footer też może być tutaj */}
+      {}
     </BrowserRouter>
   );
 }
