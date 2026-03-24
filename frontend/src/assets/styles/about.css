@@ -1,21 +1,47 @@
-/* --- src/assets/styles/about.css --- */
+/* --- src/assets/styles/about.css (POPRAWIONY) --- */
 
 .about-page {
   font-family: inherit;
+  --spacing-section: 8rem; /* Większe, profesjonalne odstępy */
+  --spacing-card: 2.5rem;
 }
 
 /* --- HERO SECTION --- */
 .about-hero {
-  background-color: var(--primary);
+  /* Dodajemy subtelny gradient dla nowoczesnego efektu */
+  background: linear-gradient(135deg, var(--primary) 0%, #1a2a47 100%);
   color: var(--white);
-  padding: 6rem 2rem;
+  padding: var(--spacing-section) 2rem 10rem 2rem; /* Większy padding u dołu pod statystyki */
   text-align: center;
+  position: relative;
+}
+
+.about-hero::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Subtelny wzór tła (opcjonalny) */
+  background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 30px 30px;
+  pointer-events: none;
+}
+
+.about-hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
 }
 
 .about-hero h1 {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+  font-size: 3.8rem;
+  margin-bottom: 1.5rem;
   font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
 }
 
 .about-hero h1 span {
@@ -23,124 +49,177 @@
 }
 
 .about-hero p {
-  font-size: 1.2rem;
-  max-width: 600px;
+  font-size: 1.3rem;
+  max-width: 650px;
   margin: 0 auto;
-  opacity: 0.9;
-  line-height: 1.6;
+  opacity: 0.85;
+  line-height: 1.7;
 }
 
-/* --- STATYSTYKI --- */
+/* --- STATYSTYKI (REFIND) --- */
 .about-stats {
-  display: flex;
-  justify-content: center;
-  gap: 3rem;
-  padding: 3rem 2rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  padding: 3.5rem;
   background-color: var(--white);
-  margin-top: -3rem; /* Lekkie najście na sekcję Hero */
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
+  /* Mocniejszy, nowoczesny cień "pływania" */
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12); 
+  max-width: 1000px;
+  margin: -6rem auto 0 auto; /* Mocniejsze najście na Hero */
+  border-radius: 16px;
   position: relative;
-  z-index: 10;
+  z-index: 20;
 }
 
 .stat-item {
   text-align: center;
+  border-right: 1px solid #eee;
+}
+
+.stat-item:last-child {
+  border-right: none;
 }
 
 .stat-number {
   display: block;
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: 800;
   color: var(--accent);
-  margin-bottom: 0.5rem;
+  line-height: 1;
+  margin-bottom: 0.7rem;
 }
 
 .stat-label {
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: var(--primary);
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
 }
 
-/* --- SEKCJA MISJI I KARTY --- */
+/* --- SEKCJA MISJI (REFIND) --- */
 .about-mission {
-  padding: 5rem 2rem;
-  max-width: 1100px;
+  padding: var(--spacing-section) 2rem;
+  max-width: 1200px;
   margin: 0 auto;
-  text-align: center;
 }
 
-.about-mission h2 {
-  font-size: 2.2rem;
+.section-header {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 5rem auto;
+}
+
+.section-header h2 {
+  font-size: 2.8rem;
   color: var(--primary);
-  margin-bottom: 3rem;
+  margin-bottom: 1rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.section-header p {
+  font-size: 1.1rem;
+  color: #666;
+  line-height: 1.6;
 }
 
 .mission-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2.5rem;
 }
 
 .mission-card {
   background: var(--white);
-  padding: 2.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-top: 4px solid transparent;
+  padding: var(--spacing-card);
+  border-radius: 16px;
+  /* Subtelniejszy cień początkowy */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04); 
+  transition: all 0.4s ease;
+  border: 1px solid rgba(0,0,0,0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .mission-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-  border-top-color: var(--accent);
+  transform: translateY(-12px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.09);
+  border-color: rgba(var(--accent-rgb), 0.2); /* Wymaga --accent-rgb, jeśli nie masz, użyj rgba(255,204,0,0.2) */
 }
 
-.card-icon {
-  font-size: 2.5rem;
-  margin-bottom: 1.5rem;
-  display: inline-block;
+.card-icon-container {
+  width: 60px;
+  height: 60px;
+  background-color: rgba(var(--primary-rgb), 0.05); /* Wymaga --primary-rgb */
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--primary);
+  border: 1px solid rgba(var(--primary-rgb), 0.1);
 }
+
+/* Jeśli nie masz zdefiniowanych --primary-rgb i --accent-rgb, 
+   zamiast kolorów rgba(var(...)) użyj sztywnych wartości, np.:
+   rgba(32, 53, 91, 0.05) dla primary i rgba(255, 204, 0, 0.1) dla accent
+*/
 
 .mission-card h3 {
   color: var(--primary);
-  font-size: 1.4rem;
-  margin-bottom: 1rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.5px;
 }
 
 .mission-card p {
-  color: #555; /* Neutralny szary dla czytelności */
-  line-height: 1.6;
+  color: #555;
+  line-height: 1.7;
+  font-size: 1rem;
+  margin: 0;
+  flex-grow: 1; /* Pcha tekst do góry, żeby przycisk był na dole jeśli dodasz */
 }
 
-/* --- CALL TO ACTION (CTA) --- */
+/* --- CTA SECTION (REFIND) --- */
 .about-cta {
-  background-color: rgba(var(--primary-rgb), 0.05); /* Delikatne tło, ew. użyj samej szarości jeśli nie masz primary-rgb */
-  padding: 5rem 2rem;
+  background-color: #f9fafb; /* Bardzo jasny, nowoczesny szary */
+  padding: var(--spacing-section) 2rem;
   text-align: center;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #eaeaea;
+}
+
+.cta-content {
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .about-cta h2 {
-  font-size: 2rem;
+  font-size: 2.5rem;
   color: var(--primary);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 800;
 }
 
-/* Reszta responsywności */
+.about-cta p {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+}
+
+/* RESPONSIVE (POLEPSZONE) */
+@media (max-width: 992px) {
+  .about-hero h1 { font-size: 3rem; }
+  .about-stats { grid-template-columns: 1fr; padding: 2.5rem; gap: 1.5rem; margin-top: -8rem; }
+  .stat-item { border-right: none; border-bottom: 1px solid #eee; padding-bottom: 1.5rem; }
+  .stat-item:last-child { border-bottom: none; padding-bottom: 0; }
+}
+
 @media (max-width: 768px) {
-  .about-stats {
-    flex-direction: column;
-    gap: 2rem;
-    margin: 1rem;
-  }
-  .about-hero h1 {
-    font-size: 2.2rem;
-  }
+  :root { --spacing-section: 5rem; }
+  .about-hero h1 { font-size: 2.5rem; }
+  .section-header h2 { font-size: 2.2rem; }
 }
