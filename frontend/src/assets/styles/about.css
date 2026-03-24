@@ -1,0 +1,146 @@
+/* --- src/assets/styles/about.css --- */
+
+.about-page {
+  font-family: inherit;
+}
+
+/* --- HERO SECTION --- */
+.about-hero {
+  background-color: var(--primary);
+  color: var(--white);
+  padding: 6rem 2rem;
+  text-align: center;
+}
+
+.about-hero h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  font-weight: 800;
+}
+
+.about-hero h1 span {
+  color: var(--accent);
+}
+
+.about-hero p {
+  font-size: 1.2rem;
+  max-width: 600px;
+  margin: 0 auto;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+/* --- STATYSTYKI --- */
+.about-stats {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  padding: 3rem 2rem;
+  background-color: var(--white);
+  margin-top: -3rem; /* Lekkie najście na sekcję Hero */
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 10;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 1rem;
+  color: var(--primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* --- SEKCJA MISJI I KARTY --- */
+.about-mission {
+  padding: 5rem 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.about-mission h2 {
+  font-size: 2.2rem;
+  color: var(--primary);
+  margin-bottom: 3rem;
+}
+
+.mission-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.mission-card {
+  background: var(--white);
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-top: 4px solid transparent;
+}
+
+.mission-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  border-top-color: var(--accent);
+}
+
+.card-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  display: inline-block;
+}
+
+.mission-card h3 {
+  color: var(--primary);
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+}
+
+.mission-card p {
+  color: #555; /* Neutralny szary dla czytelności */
+  line-height: 1.6;
+}
+
+/* --- CALL TO ACTION (CTA) --- */
+.about-cta {
+  background-color: rgba(var(--primary-rgb), 0.05); /* Delikatne tło, ew. użyj samej szarości jeśli nie masz primary-rgb */
+  padding: 5rem 2rem;
+  text-align: center;
+  border-top: 1px solid #eee;
+}
+
+.about-cta h2 {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+}
+
+/* Reszta responsywności */
+@media (max-width: 768px) {
+  .about-stats {
+    flex-direction: column;
+    gap: 2rem;
+    margin: 1rem;
+  }
+  .about-hero h1 {
+    font-size: 2.2rem;
+  }
+}
