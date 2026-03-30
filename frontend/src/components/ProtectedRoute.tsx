@@ -1,19 +1,21 @@
 import { Navigate } from 'react-router-dom';
-import React from 'react'; // Zamiast react/jsx-dev-runtime
+import React from 'react';
+import type { User } from '../App'; // Importujemy typ użytkownika
 
-// Definiujemy typy propsów (ReactNode jest bezpieczniejszy niż JSX.Element)
 interface ProtectedRouteProps {
-  isLoggedIn: boolean;
+  // Zmieniamy isLoggedIn na user
+  user: User | null;
   children: React.ReactNode; 
 }
 
-const ProtectedRoute = ({ isLoggedIn, children }: ProtectedRouteProps) => {
-  if (!isLoggedIn) {
+const ProtectedRoute = ({ user, children }: ProtectedRouteProps) => {
+  // Jeśli user jest nullem (nikt nie jest zalogowany), wyślij go do logowania
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
   
-  return children;
+  // Jeśli user istnieje, pozwól mu zobaczyć zawartość (np. Lekcje)
+  return <>{children}</>;
 };
 
-// TO JEST KLUCZOWE: Musimy pozwolić innym plikom na użycie tego komponentu
 export default ProtectedRoute;
