@@ -52,7 +52,7 @@ export default function HomePage() {
               textDecoration: 'none', 
               fontWeight: 'bold' 
             }}>
-              Zobacz wszystkie kursy →
+              Zobacz wszystkie kursy 
             </Link>
           </div>
           
