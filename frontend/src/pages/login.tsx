@@ -59,7 +59,7 @@ const Login = ({ setUser }: LoginProps) => {
                 type="text"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
-                placeholder="e.g. admin"
+                placeholder="e.g. user"
                 style={styles.input}
                 required
               />
