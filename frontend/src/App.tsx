@@ -9,6 +9,7 @@ import Login from './pages/login';
 import ProtectedRoute from './components/ProtectedRoute';
 import About from './pages/About';
 import Register from './pages/Register';
+import Profile from './pages/Profile';
 
 // Nasza nowa logika użytkownika - po angielsku
 export type Role = 'Admin' | 'Client' | 'Firm';
@@ -50,7 +51,10 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/about" element={<About />} />
-          <Route path="/register" element={<Register setUser={setUser} />} />        </Routes>
+          <Route path="/register" element={<Register setUser={setUser} />} />
+          <Route path="/profil" element={<Profile user={user} setUser={setUser} />} />
+        </Routes>
+          
       </main>
     </BrowserRouter>
   );

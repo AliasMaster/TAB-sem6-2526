@@ -1,0 +1,274 @@
+/* --- KONTENER STRONY --- */
+.profile-page-wrapper {
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  font-family: 'Inter', sans-serif;
+  color: var(--text-dark);
+}
+
+.profile-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* --- SEKCJA HERO (CIEMNA) --- */
+.profile-hero {
+  background-color: var(--primary);
+  color: var(--white);
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Układ Flex: Tekst po lewej, Awatar po prawej */
+.hero-flex {
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  gap: 60px;               
+  max-width: 1000px;       
+  margin: 0 auto;
+  padding: 4rem 0;
+  position: relative;
+  z-index: 2;
+}
+
+/* Rozbłysk światła za kółkiem */
+.profile-hero::after {
+  content: '';
+  position: absolute;
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, rgba(30, 41, 59, 0) 70%);
+  top: 50%;
+  right: -100px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* LEWA STRONA - TEKST */
+.hero-text-side {
+  flex: 0 1 auto;
+  text-align: left;
+  padding-right: 0rem;
+}
+
+.hero-text-side h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+  font-weight: 300;
+  color: var(--bg-color);
+  opacity: 0.6;
+  letter-spacing: 0.5px;
+  max-width: 500px;
+  margin: 0 !important; /* Wymuszamy lewą stronę */
+  text-align: left;
+  line-height: 1.5;
+}
+
+/* PRAWA STRONA - AWATAR */
+.hero-avatar-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  }
+
+.avatar-container {
+  width: 180px;
+  height: 180px;
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.avatar-large {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: var(--accent);
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.avatar-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-letter {
+  font-size: 4rem;
+  font-weight: bold;
+  color: var(--primary);
+}
+
+/* Hover na awatarze: do góry + cień + obwódka */
+.avatar-large:hover {
+  transform: translateY(-10px);
+  border-color: var(--accent);
+  box-shadow: 0 20px 40px rgba(245, 158, 11, 0.25);
+}
+
+.avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  opacity: 0;
+  transition: 0.3s;
+  border-radius: 50%;
+  color: white;
+}
+
+.avatar-large:hover .avatar-overlay {
+  opacity: 1;
+}
+
+/* --- UKŁAD KART (2 KOLUMNY) --- */
+.profile-main {
+  padding: 4rem 0;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2.5rem;
+}
+
+.profile-card {
+  background: var(--white);
+  padding: 2.5rem;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+/* --- INPUTY I EFEKTY HOVER --- */
+.input-group {
+  margin-bottom: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.input-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.profile-input {
+  padding: 0.9rem 1.2rem;
+  border-radius: 12px;
+  border: 2px solid var(--border-color);
+  background-color: var(--bg-color);
+  font-size: 1rem;
+  color: var(--text-dark);
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+/* Hover na inputach: do góry + pomarańczowy obwód + cień */
+.profile-input:hover, .profile-input:focus {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  background-color: var(--white);
+  box-shadow: 0 12px 20px rgba(245, 158, 11, 0.12);
+}
+
+/* --- PRZYCISKI I LINKI --- */
+.field-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 8px;
+}
+
+.save-link {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.save-link:hover {
+  color: var(--accent-hover);
+}
+
+.cancel-link {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  text-decoration: underline;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.btn-apply {
+  display: block;         
+  width: fit-content;     
+  margin-left: auto;      
+  margin-right: auto;
+  background: var(--accent);
+  color: var(--primary);
+  border: none;
+  padding: 0.9rem 2rem;
+  border-radius: 30px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+  white-space: nowrap;
+}
+
+.btn-apply:hover {
+  background: var(--accent-hover);
+  transform: scale(1.05);
+}
+
+/* --- STATUS KONTENER --- */
+.status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  font-size: 1rem;
+}
+
+.role-badge {
+  background: #fef3c7;
+  color: var(--accent-hover);
+  padding: 0.3rem 0.9rem;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 0.75rem;
+}
