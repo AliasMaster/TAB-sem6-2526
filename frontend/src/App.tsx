@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import About from './pages/About';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import Community from './pages/Community';
 
 // Nasza nowa logika użytkownika - po angielsku
 export type Role = 'Admin' | 'Client' | 'Firm';
@@ -34,7 +35,8 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/katalog" element={<CoursePage />} /> 
+          <Route path="/katalog" element={<CoursePage />} />
+          <Route path="/forum" element={<Community />} />
           
           {/* Strona logowania dostaje funkcję setUser */}
           <Route path="/login" element={<Login setUser={setUser} />} /> 
