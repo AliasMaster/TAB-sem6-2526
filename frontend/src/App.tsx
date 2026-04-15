@@ -36,7 +36,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/katalog" element={<CoursePage />} />
-          <Route path="/forum" element={<Community />} />
+          <Route path="/forum" element={<Community user={user} />} />
           
           {/* Strona logowania dostaje funkcję setUser */}
           <Route path="/login" element={<Login setUser={setUser} />} /> 
