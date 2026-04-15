@@ -1,7 +1,7 @@
 // src/pages/Community/Community.tsx
 import React, { useState } from 'react';
 import { CATEGORIES, MOCK_THREADS, MOCK_POSTS, type ForumThread, type Category } from '../data/mockCommunity';
-import './Community.css';
+import '../assets/styles/community.css';
 
 const Community: React.FC = () => {
     // Stan przechowujący wybraną kategorię

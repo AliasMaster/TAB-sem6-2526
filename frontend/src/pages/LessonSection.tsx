@@ -28,7 +28,7 @@ const LessonSection: React.FC = () => {
       <div className="container">
         <div className="learning-header">
           <span className="badge">Metodologia </span>
-          <h2 className="section-title">Jak wygląda nauka u nas?ZALECANE ZMIENIC WSZYSTKO TYLKO PODGLAD</h2>
+          <h2 className="section-title">Jak wygląda nauka u nas?</h2>
           <p className="section-subtitle">
             Nasze podejście opiera się na praktyce i projektach, które realnie rozwijają Twoje umiejętności.
           </p>
