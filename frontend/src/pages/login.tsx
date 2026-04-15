@@ -14,8 +14,8 @@ const Login = ({ setUser }: LoginProps) => {
 
   const MOCK_USERS: User[] = [
     { id: 1, login: 'admin', email: 'admin@eduforge.com', role: 'Admin' },
-    { id: 2, login: 'client_test', email: 'client@eduforge.com', role: 'Client' },
-    { id: 3, login: 'firm_test', email: 'firm@eduforge.com', role: 'Firm' },
+    { id: 2, login: 'client', email: 'client@eduforge.com', role: 'Client' },
+    { id: 3, login: 'firm', email: 'firm@eduforge.com', role: 'Firm' },
   ];
 
   const handleLogin = (e: React.FormEvent) => {
