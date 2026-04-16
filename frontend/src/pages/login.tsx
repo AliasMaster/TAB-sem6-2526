@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // Dodany Link
+import { useNavigate, Link } from 'react-router-dom';
 import type { User } from '../App';
 
 interface LoginProps {
@@ -12,14 +12,12 @@ const Login = ({ setUser }: LoginProps) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
- 
-// Funkcja obsługująca logowanie przez api Gateway NOWOŚĆ! Zamiast lokalnej symulacji, teraz łączymy się z backendem
- const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     try {
-      // Zakładamy, że API Gateway wystawia endpoint na /api/auth/login
+      // Łączymy się z API Gateway
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
@@ -29,19 +27,23 @@ const Login = ({ setUser }: LoginProps) => {
             Identifier: identifier, 
             Password: password 
         }),
-        credentials: 'include', // POTĘŻNIE WAŻNE DLA CIASTECZEK! Zezwala na przyjmowanie i wysyłanie cookies
+        credentials: 'include', // Pozwala na obsługę ciasteczek HttpOnly
       });
 
       if (response.ok) {
-        // Zakładamy, że backend po udanym logowaniu zwraca dane usera (np. id, login, role)
-        // a samo zabezpieczenie (Token JWT) jest wysyłane w ukrytym ciasteczku HttpOnly
         const userData = await response.json(); 
-        setUser(userData);
+        
+        // --- DEBUG: Sprawdź w konsoli (F12) czy tutaj jest profilePic ---
+        console.log("Zalogowano pomyślnie. Dane użytkownika:", userData);
+
+        // Ustawiamy użytkownika w stanie globalnym (App.tsx)
+        // userData musi zawierać: id, login, email, role ORAZ profilePic
+        setUser(userData); 
+        
         navigate('/');
       } else {
-        // Opcjonalnie: odczytanie wiadomości o błędzie z backendu
-        // const errorData = await response.json();
-        setError('Błędne dane logowania.');
+        const errorMsg = await response.text();
+        setError(errorMsg || 'Błędne dane logowania.');
       }
     } catch (err) {
       console.error("Błąd połączenia z serwerem", err);
@@ -94,12 +96,11 @@ const Login = ({ setUser }: LoginProps) => {
 
             {error && <p style={styles.errorText}>{error}</p>}
 
-            <button type="submit" className="btn btn-primary" style={styles.loginButton}>
+            <button type="submit" style={styles.loginButton}>
               Login Now
             </button>
           </form>
 
-          {/* NOWY ELEMENT: LINK DO REJESTRACJI */}
           <div style={styles.registerPrompt}>
             Don't have an account? <Link to="/register" style={styles.registerLink}>Register here</Link>
           </div>
@@ -117,6 +118,7 @@ const Login = ({ setUser }: LoginProps) => {
   );
 };
 
+/* --- STYLE --- */
 const styles: { [key: string]: React.CSSProperties } = {
   pageContainer: {
     minHeight: '100vh',
@@ -128,7 +130,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     padding: '0 2rem',
     position: 'relative',
     overflow: 'hidden',
-    fontFamily: 'sans-serif'
+    fontFamily: 'Inter, sans-serif'
   },
   glowBgLeft: {
     position: 'absolute',
@@ -155,7 +157,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    maxWidth: '1400px',
+    maxWidth: '1200px',
     zIndex: 10,
     flexWrap: 'nowrap',
   },
@@ -216,10 +218,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginTop: '1rem',
     borderRadius: '12px',
     textTransform: 'uppercase',
-    letterSpacing: '1px'
+    letterSpacing: '1px',
+    backgroundColor: '#f6ad55',
+    color: '#0c111e',
+    transition: 'transform 0.2s',
   },
   errorText: { color: '#ef4444', fontSize: '0.9rem', fontWeight: '600' },
-  // STYLE DLA PROMPTU REJESTRACJI
   registerPrompt: {
     marginTop: '1.5rem',
     fontSize: '0.95rem',

@@ -76,7 +76,7 @@ app.MapPost("/register", async (RegisterRequest request, AuthDbContext context, 
     var token = GenerateJwtToken(newUser);
     httpContext.Response.Cookies.Append("auth_token", token, globalCookieOptions);
 
-    return Results.Ok(new { id = newUser.Id, login = newUser.Login, role = newUser.Role, email = newUser.Email });
+    return Results.Ok(new { id = newUser.Id, login = newUser.Login, role = newUser.Role, email = newUser.Email , profilePic = newUser.ProfilePic});
 });
 
 app.MapPost("/login", async (LoginRequest request, AuthDbContext context, HttpContext httpContext) =>
@@ -89,7 +89,7 @@ app.MapPost("/login", async (LoginRequest request, AuthDbContext context, HttpCo
     var token = GenerateJwtToken(user);
     httpContext.Response.Cookies.Append("auth_token", token, globalCookieOptions);
 
-    return Results.Ok(new { id = user.Id, login = user.Login, role = user.Role, email = user.Email });
+    return Results.Ok(new { id = user.Id, login = user.Login, role = user.Role, email = user.Email ,profilePic = user.ProfilePic});
 });
 
 app.MapGet("/me", async (HttpContext httpContext, AuthDbContext context) =>

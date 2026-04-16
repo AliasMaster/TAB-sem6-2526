@@ -272,3 +272,41 @@
   font-weight: 800;
   font-size: 0.75rem;
 }
+
+
+/* --- STATUS MESSAGE (Powiadomienia) --- */
+.status-message {
+  margin-top: 2rem;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  animation: slideDown 0.4s ease-out;
+}
+
+.status-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: currentColor;
+  color: white; /* Kolor ikony wewnątrz kółka */
+  font-size: 0.75rem;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

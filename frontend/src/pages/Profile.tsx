@@ -26,7 +26,28 @@ const Profile = ({ user, setUser }: ProfileProps) => {
   if (!user) return null;
 const saveField = async (field: keyof User | 'password', value: string) => {
     if (!user) return;
-    
+
+    if (field === 'login') {
+    if (value.length < 4) {
+      setMessage({ text: 'Login musi mieć co najmniej 4 znaki.', color: '#ef4444' });
+      return;
+    }
+  }
+
+  if (field === 'email') {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(value)) {
+      setMessage({ text: 'Podaj poprawny adres e-mail.', color: '#ef4444' });
+      return;
+    }
+  }
+
+  if (field === 'password') {
+    if (value.length < 6) {
+      setMessage({ text: 'Hasło musi mieć co najmniej 6 znaków.', color: '#ef4444' });
+      return;
+    }
+  }
     // Przygotowujemy paczkę danych do wysłania. 
     // Wysyłamy ID użytkownika i TYLKO to pole, które zmieniamy.
     const payload = {
@@ -35,7 +56,11 @@ const saveField = async (field: keyof User | 'password', value: string) => {
       newEmail: field === 'email' ? value : undefined,
       newPassword: field === 'password' ? value : undefined,
     };
-
+    const showMessage = (text: string, color: string) => {
+    setMessage({ text, color });
+    // Automatyczne znikanie po 4 sekundach
+    setTimeout(() => setMessage({ text: '', color: '' }), 4000);
+  };
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/update`, {
         method: 'PUT',
@@ -76,14 +101,31 @@ const saveField = async (field: keyof User | 'password', value: string) => {
       reader.readAsDataURL(file);
     }
   };
+const savePhoto = async () => {
+  if (user && profileImage) {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/update`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: user.id,
+          newProfilePic: profileImage // Wysyłamy base64 do bazy
+        }),
+        credentials: 'include'
+      });
 
-  const savePhoto = () => {
-    if (user && profileImage) {
-      setUser({ ...user, profilePic: profileImage });
-      setHasNewPhoto(false);
-      setMessage({ text: 'Zdjęcie zapisane!', color: '#2ecc71' });
+      if (response.ok) {
+        setUser({ ...user, profilePic: profileImage });
+        setHasNewPhoto(false);
+        setMessage({ text: 'Zdjęcie profilowe zostało zaktualizowane!', color: '#2ecc71' });
+      } else {
+        setMessage({ text: 'Błąd podczas zapisywania zdjęcia.', color: '#ef4444' });
+      }
+    } catch (error) {
+      setMessage({ text: 'Błąd połączenia z serwerem.', color: '#ef4444' });
     }
-  };
+  }
+};
 
   return (
     <div className="profile-page-wrapper">
@@ -119,7 +161,14 @@ const saveField = async (field: keyof User | 'password', value: string) => {
 
         </div>
       </section>
-
+       {message.text && (
+  <div className="profile-container">
+    <div className="status-message" style={{ backgroundColor: message.color + '22', color: message.color, borderColor: message.color }}>
+      <span className="status-icon">{message.color === '#2ecc71' ? '✓' : '✕'}</span>
+      {message.text}
+    </div>
+  </div>
+)}        
       <section className="profile-main">
         <div className="profile-container settings-grid">
           
