@@ -86,6 +86,8 @@ body {
 .hero-btns {
   display: flex;
   gap: 1rem;
+  margin-top: 50px
+  
 }
 
 
@@ -481,7 +483,8 @@ body {
   gap: 12px;
   position: relative;
   overflow: hidden;
-  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); /* Bardzo płynna animacja */
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  
 
   /* --- EFEKT GŁĘBI I POŁYSKU (Wewnętrzne cienie) --- */
   box-shadow: 
@@ -495,7 +498,7 @@ body {
 
 /* --- HOVER EFEKTY --- */
 .btn-hero-gradient:hover {
-  transform: translateY(-6px) scale(1.04); /* Większe uniesienie */
+  transform: translateY(-0.5px) scale(1.04); /* Większe uniesienie */
   background-position: right center; /* Przesunięcie płynu */
   
   /* Wzmocnienie cieni na hover */
@@ -567,6 +570,7 @@ body {
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1); /* Subtelna krawędź szkła */
   transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  
 
   /* --- EFEKT GŁĘBI (Analogiczny do głównego) --- */
   box-shadow: 
@@ -577,7 +581,7 @@ body {
 
 /* --- HOVER EFEKTY --- */
 .btn-hero-secondary-3d:hover {
-  transform: translateY(-6px) scale(1.04);
+  transform: translateY(-0.5px) scale(1.04);
   background-position: right center;
   color: var(--accent); /* Tekst zmienia się na złoty przy najechaniu */
   border-color: rgba(245, 158, 11, 0.5);
@@ -636,7 +640,7 @@ body {
 
 .hero-content h1, 
 .hero-content p, 
-.hero-btns, 
+.hero-btns,
 .search-bar {
   opacity: 0;
   animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
