@@ -300,8 +300,7 @@ body {
   margin-bottom: 1rem;
   
   /* Tekst jako wycięcie (Outline + Glow) */
-  background: linear-gradient(to bottom, #fff 40%, var(--accent) 100%);
-  -webkit-background-clip: text;
+  background: linear-gradient(to bottom, #fff 40%, var(--accent) 100%);;
   -webkit-text-fill-color: transparent;
   
   filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.5));
@@ -384,7 +383,6 @@ body {
   margin-bottom: 1.5rem;
   letter-spacing: -1px;
   background: linear-gradient(to bottom, #fff, #94a3b8);
-  -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
