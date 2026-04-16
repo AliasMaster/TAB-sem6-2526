@@ -24,12 +24,44 @@ const Profile = ({ user, setUser }: ProfileProps) => {
   const [message, setMessage] = useState({ text: '', color: '' });
 
   if (!user) return null;
+const saveField = async (field: keyof User | 'password', value: string) => {
+    if (!user) return;
+    
+    // Przygotowujemy paczkę danych do wysłania. 
+    // Wysyłamy ID użytkownika i TYLKO to pole, które zmieniamy.
+    const payload = {
+      id: user.id,
+      newLogin: field === 'login' ? value : undefined,
+      newEmail: field === 'email' ? value : undefined,
+      newPassword: field === 'password' ? value : undefined,
+    };
 
-  const saveField = (field: keyof User | 'password', value: string) => {
-    if (field === 'password') {
-      setNewPassword('');
-    } else {
-      setUser({ ...user, [field]: value });
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/update`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        if (field === 'password') {
+          setNewPassword('');
+          setMessage({ text: 'Hasło zmienione pomyślnie!', color: '#2ecc71' });
+        } else {
+          setUser({ ...user, [field]: value }); // Zapisujemy w stanie Reacta dopiero po potwierdzeniu z bazy
+          setMessage({ text: 'Dane zapisane!', color: '#2ecc71' });
+        }
+      } else {
+        const errorMsg = await response.text();
+        setMessage({ text: errorMsg || 'Błąd zapisu.', color: '#ef4444' });
+        // Jeśli błąd loginu, cofamy input do poprzedniej wartości
+        if (field === 'login') setTempLogin(user.login);
+        if (field === 'email') setTempEmail(user.email);
+      }
+    } catch (error) {
+      console.error("Błąd połączenia", error);
+      setMessage({ text: 'Błąd połączenia z serwerem.', color: '#ef4444' });
     }
   };
 

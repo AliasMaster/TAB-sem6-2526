@@ -12,25 +12,40 @@ const Login = ({ setUser }: LoginProps) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const MOCK_USERS: User[] = [
-    { id: 1, login: 'admin', email: 'admin@eduforge.com', role: 'Admin' },
-    { id: 2, login: 'client', email: 'client@eduforge.com', role: 'Client' },
-    { id: 3, login: 'firm', email: 'firm@eduforge.com', role: 'Firm' },
-  ];
-
-  const handleLogin = (e: React.FormEvent) => {
+ 
+// Funkcja obsługująca logowanie przez api Gateway NOWOŚĆ! Zamiast lokalnej symulacji, teraz łączymy się z backendem
+ const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    const foundUser = MOCK_USERS.find(
-      (u) => u.email === identifier || u.login === identifier
-    );
+    try {
+      // Zakładamy, że API Gateway wystawia endpoint na /api/auth/login
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+            Identifier: identifier, 
+            Password: password 
+        }),
+        credentials: 'include', // POTĘŻNIE WAŻNE DLA CIASTECZEK! Zezwala na przyjmowanie i wysyłanie cookies
+      });
 
-    if (foundUser && password.length >= 6) {
-      setUser(foundUser);
-      navigate('/');
-    } else {
-      setError('Invalid credentials or password too short (min 6 chars).');
+      if (response.ok) {
+        // Zakładamy, że backend po udanym logowaniu zwraca dane usera (np. id, login, role)
+        // a samo zabezpieczenie (Token JWT) jest wysyłane w ukrytym ciasteczku HttpOnly
+        const userData = await response.json(); 
+        setUser(userData);
+        navigate('/');
+      } else {
+        // Opcjonalnie: odczytanie wiadomości o błędzie z backendu
+        // const errorData = await response.json();
+        setError('Błędne dane logowania.');
+      }
+    } catch (err) {
+      console.error("Błąd połączenia z serwerem", err);
+      setError('Brak połączenia z serwerem. Spróbuj ponownie później.');
     }
   };
 

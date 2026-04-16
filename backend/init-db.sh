@@ -2,11 +2,7 @@
 set -e
 
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
-    -- TYPES
-    CREATE TYPE user_role AS ENUM ('Admin', 'User', 'Company');
-    CREATE TYPE thread_category AS ENUM ('General', 'Feedback', 'Support');
-    CREATE TYPE course_status AS ENUM ('Active', 'Inactive');
-    CREATE TYPE payment_status AS ENUM ('Pending', 'Completed', 'Failed');
+    -- USUNIĘTO SEKCJE TYPES (ENUMY)
 
     -- SCHEMAS
     CREATE SCHEMA auth;
@@ -19,8 +15,10 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     CREATE TABLE auth.users (
         id UUID PRIMARY KEY,
         login VARCHAR(255) NOT NULL UNIQUE,
+        email VARCHAR(255) UNIQUE,          
+        profile_pic TEXT,
         password_hash VARCHAR(255) NOT NULL,
-        role user_role NOT NULL
+        role VARCHAR(50) NOT NULL CHECK (role IN ('Admin', 'User', 'Company'))
     );
 
     -- COMMUNITY
@@ -30,7 +28,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
         title VARCHAR(255) NOT NULL,
         author_id UUID NOT NULL REFERENCES auth.users(id),
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        category thread_category NOT NULL
+        category VARCHAR(50) NOT NULL CHECK (category IN ('General', 'Feedback', 'Support'))
     );
 
     CREATE TABLE community.posts (
@@ -48,7 +46,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
         title VARCHAR(255) NOT NULL,
         description TEXT,
         price DECIMAL(10, 2) NOT NULL,
-        status course_status NOT NULL
+        status VARCHAR(50) NOT NULL CHECK (status IN ('Active', 'Inactive'))
     );
 
     CREATE TABLE catalog.lessons (
@@ -82,12 +80,11 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
         user_id UUID NOT NULL REFERENCES auth.users(id),
         course_id UUID NOT NULL REFERENCES catalog.courses(id),
         amount DECIMAL(10, 2) NOT NULL,
-        status payment_status NOT NULL,
+        status VARCHAR(50) NOT NULL CHECK (status IN ('Pending', 'Completed', 'Failed')),
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
 
     -- USERS
-
     CREATE USER auth_user WITH PASSWORD '$AUTH_DB_PASSWORD';
     CREATE USER community_user WITH PASSWORD '$COMMUNITY_DB_PASSWORD';
     CREATE USER catalog_user WITH PASSWORD '$CATALOG_DB_PASSWORD';

@@ -42,40 +42,55 @@ const Register = ({ setUser }: RegisterProps) => {
     }
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (isUsernameTaken || TAKEN_EMAILS.includes(email.toLowerCase().trim())) {
-      setError("Account already exists! Use a different email or login here.");
-      return;
-    }
-
     if (password !== confirmPassword) {
-      setError("Passwords don't match!");
+      setError("Hasła nie są identyczne!");
       return;
     }
-
     if (password.length < 6) {
-      setError("Password is too short (min. 6 characters).");
+      setError("Hasło jest zbyt krótkie (min. 6 znaków).");
       return;
     }
 
-    // --- LOGIKA AUTOMATYCZNEGO LOGOWANIA ---
-    // Tworzymy obiekt nowego użytkownika (zawsze jako Client)
-    const newUser: User = {
-      id: Date.now(), // Generujemy tymczasowe ID na podstawie czasu
-      login: username,
-      email: email,
-      role: 'Client',
-      profilePic: profileImage
-    };
+    try {
+      // 1. Rejestracja użytkownika w backendzie
+      const registerRes = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ Login: username, Email: email, Password: password }),
+  credentials: 'include'
+      });
 
-    // Zapisujemy go w stanie aplikacji
-    setUser(newUser);
+      if (!registerRes.ok) {
+        const errorText = await registerRes.text();
+        setError(errorText || "Błąd podczas rejestracji.");
+        return;
+      }
 
-    // Przekierowujemy na stronę główną
-    navigate('/'); 
+      // 2. Automatyczne logowanie po udanej rejestracji, aby pobrać ciasteczko i dane
+      const loginRes = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ Identifier: username, Password: password }),
+        credentials: 'include' // Bardzo ważne dla ciasteczek!
+      });
+
+      if (loginRes.ok) {
+        const userData = await loginRes.json();
+        // Dodajemy profilowe i email do stanu (backend na razie zwraca id, login, role)
+        setUser({ ...userData, email: email, profilePic: profileImage });
+        navigate('/'); 
+      } else {
+        navigate('/login'); // Jeśli logowanie się nie uda, wyślij do logowania
+      }
+
+    } catch (err) {
+      console.error("Błąd serwera:", err);
+      setError("Brak połączenia z serwerem.");
+    }
   };
 
   return (
