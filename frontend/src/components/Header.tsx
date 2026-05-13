@@ -25,6 +25,9 @@ export default function Header({ user, setUser }: HeaderProps) {
           <NavLink to="/katalog" className={({ isActive }) => isActive ? 'active' : ''}>Katalog Kursów</NavLink>
           <NavLink to="/nauka" className={({ isActive }) => isActive ? 'active' : ''}>Sekcja Nauki</NavLink> 
           <NavLink to="/forum" className={({ isActive }) => isActive ? 'active' : ''}>Forum</NavLink>
+          {user?.role === 'Admin' && (
+            <NavLink to="/raport" className={({ isActive }) => isActive ? 'active' : ''}>Raporty</NavLink>
+          )}
         </nav>
 
         {/* SEKRETY LOGOWANIA / PROFILU */}

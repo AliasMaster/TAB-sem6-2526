@@ -11,6 +11,7 @@ import About from './pages/About';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Community from './pages/Community';
+import Reports from './pages/Reports';
 
 // Nasza nowa logika użytkownika - po angielsku
 export type Role = 'Admin' | 'Client' | 'Firm';
@@ -55,6 +56,11 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/register" element={<Register setUser={setUser} />} />
           <Route path="/profil" element={<Profile user={user} setUser={setUser} />} />
+          <Route path="/raport" element={
+            <ProtectedRoute user={user}>
+              <Reports user={user} />
+            </ProtectedRoute>
+          } />
         </Routes>
           
       </main>

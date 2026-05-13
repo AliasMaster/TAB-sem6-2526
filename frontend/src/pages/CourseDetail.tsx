@@ -1,10 +1,13 @@
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import ReactPlayer from 'react-player';
 import { courses } from '../data';
 import '../assets/styles/coursedetail.css'; 
 
 export default function CourseDetailPage() {
   const { id } = useParams<{ id: string }>();
   const course = courses.find(c => c.id.toString() === id);
+  const [selectedLessonUrl, setSelectedLessonUrl] = useState<string | null>(null);
 
   if (!course) {
     return <h1 style={{textAlign: 'center', marginTop: '5rem'}}>Kurs nie znaleziony</h1>;
@@ -64,14 +67,36 @@ export default function CourseDetailPage() {
   </div>
 </div>
 
-        <div style={{background: '#fff', padding: '2rem', borderRadius: '16px', border: '1px solid #e2e8f0'}}>
+        <div style={{background: '#fff', padding: '2rem', borderRadius: '16px', border: '1px solid #e2e8f0', width: '100%'}}>
+          
+          {selectedLessonUrl && (
+            <div style={{marginBottom: '2rem', borderRadius: '12px', overflow: 'hidden', background: '#000'}}>
+              <ReactPlayer 
+                url={selectedLessonUrl} 
+                controls={true} 
+                width="100%" 
+                height="auto" 
+                playing={true}
+              />
+            </div>
+          )}
+
           <h3 style={{marginBottom: '1.5rem'}}>Program Kursu</h3>
           {course.modules?.map(module => (
             <div key={module.id} className="module">
               <h4 className="module-title">{module.title}</h4>
               <div>
                 {module.lessons.map(lesson => (
-                  <div key={lesson.id} className="lesson">
+                  <div 
+                    key={lesson.id} 
+                    className="lesson" 
+                    style={{cursor: 'pointer'}}
+                    onClick={() => {
+                      // Tutaj w przyszłości będzie link z backendu: `http://localhost:8080/course/${course.id}/lesson/${lesson.id}/content`
+                      // Dla celów testowych ustawiamy mock URL jeśli API jeszcze nie działa
+                      setSelectedLessonUrl(`http://localhost:8080/course/${course.id}/lesson/${lesson.id}/content`);
+                    }}
+                  >
                     <span>{lesson.title}</span>
                     <span style={{color: '#64748b'}}>{lesson.durationMinutes} min</span>
                   </div>

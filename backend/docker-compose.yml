@@ -6,6 +6,14 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      AUTH_DB_PASSWORD: ${AUTH_DB_PASSWORD}
+      COMMUNITY_DB_PASSWORD: ${COMMUNITY_DB_PASSWORD}
+      CATALOG_DB_PASSWORD: ${CATALOG_DB_PASSWORD}
+      ORDERS_DB_PASSWORD: ${ORDERS_DB_PASSWORD}
+      REPORT_DB_PASSWORD: ${REPORT_DB_PASSWORD}
+      ENROLLMENT_DB_PASSWORD: ${ENROLLMENT_DB_PASSWORD}
+    ports:
+      - "5432:5432"
     volumes:
       - posgres_data:/var/lib/postgresql/data
       - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
@@ -25,26 +33,41 @@ services:
   api-gateway:
     build: ./src/Services/Api
     container_name: api-gateway
+    environment:
+      Jwt__Secret: ${JWT_SECRET}
+      Jwt__Issuer: auth-service
+      Jwt__Audience: tab-app
     ports:
       - "80:8080"
     depends_on:
       - database
       - order-service
+      - catalog-service
+      - community-service
+      - report-service
+      - enrollment-service
+      - auth-service
 
   auth-service:
     build: ./src/Services/Auth
     container_name: auth-service
     environment:
-      DATABASE_URL: postgres://database/app_db
+      ConnectionStrings__AuthDb: Host=database;Port=5432;Database=${POSTGRES_DB};Username=auth_user;Password=${AUTH_DB_PASSWORD}
+      Jwt__Secret: ${JWT_SECRET}
+      Jwt__Issuer: auth-service
+      Jwt__Audience: tab-app
+      Jwt__AccessTokenExpiryMinutes: 15
+      Jwt__RefreshTokenExpiryDays: 7
     depends_on:
       - database
+    restart: always
 
   order-service:
     build: ./src/Services/Order
     container_name: order-service
     environment:
-      DATABASE_URL: postgres://database:5432/app_db
-      RABBITMQ_URL: amqp://rabbitmq
+      ConnectionStrings__OrderDb: Host=database;Port=5432;Database=${POSTGRES_DB};Username=orders_user;Password=${ORDERS_DB_PASSWORD}
+      RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq
     depends_on:
       - database
       - rabbitmq
@@ -53,7 +76,7 @@ services:
     build: ./src/Services/Catalog
     container_name: catalog-service
     environment:
-      DATABASE_URL: postgres://database/app_db
+      ConnectionStrings__CatalogDb: Host=database;Port=5432;Database=${POSTGRES_DB};Username=catalog_user;Password=${CATALOG_DB_PASSWORD}
     depends_on:
       - database
 
@@ -61,8 +84,8 @@ services:
     build: ./src/Services/Community
     container_name: community-service
     environment:
-      DATABASE_URL: postgres://database/app_db
-      RABBITMQ_URL: amqp://rabbitmq
+      ConnectionStrings__CommunityDb: Host=database;Port=5432;Database=${POSTGRES_DB};Username=community_user;Password=${COMMUNITY_DB_PASSWORD}
+      RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq
     depends_on:
       - database
       - rabbitmq
@@ -71,8 +94,8 @@ services:
     build: ./src/Services/Report
     container_name: report-service
     environment:
-      DATABASE_URL: postgres://database/app_db
-      RABBITMQ_URL: amqp://rabbitmq
+      ConnectionStrings__ReportDb: Host=database;Port=5432;Database=${POSTGRES_DB};Username=report_user;Password=${REPORT_DB_PASSWORD}
+      RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq
     depends_on:
       - database
       - rabbitmq
@@ -81,9 +104,20 @@ services:
     build: ./src/Services/Enrollment
     container_name: enrollment-service
     environment:
-      DATABASE_URL: postgres://database/app_db
+      ConnectionStrings__EnrollmentDb: Host=database;Port=5432;Database=${POSTGRES_DB};Username=enrollment_user;Password=${ENROLLMENT_DB_PASSWORD}
+      RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq
     depends_on:
       - database
+      - rabbitmq
+
+  file-storage-service:
+    build: ./src/Services/FileStorage
+    container_name: file-storage-service
+    volumes:
+      - ./data/uploads:/app/uploads
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+    restart: always
 
 volumes:
   posgres_data:
