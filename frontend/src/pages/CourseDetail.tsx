@@ -67,28 +67,47 @@ export default function CourseDetailPage() {
       }, 2000);
     } catch (err: any) {
       console.error(err);
-      const msg = err?.response?.data?.message || 'Wystąpił błąd podczas płatności.';
+      const msg =
+        err?.response?.data?.message || 'Wystąpił błąd podczas płatności.';
       setPurchaseStatus(msg);
     }
   };
 
   if (loading) {
-    return <h1 style={{textAlign: 'center', marginTop: '5rem'}}>Ładowanie...</h1>;
+    return (
+      <h1 style={{ textAlign: 'center', marginTop: '5rem' }}>Ładowanie...</h1>
+    );
   }
 
   if (!course) {
-    return <h1 style={{textAlign: 'center', marginTop: '5rem'}}>Kurs nie znaleziony</h1>;
+    return (
+      <h1 style={{ textAlign: 'center', marginTop: '5rem' }}>
+        Kurs nie znaleziony
+      </h1>
+    );
   }
 
   return (
     <div>
       <section className="detail-hero">
         <div className="container detail-hero-content">
-          <img src={course.imageUrl || 'https://via.placeholder.com/400x250'} alt={course.title} className="detail-image" />
+          <img
+            src={course.imageUrl || 'https://via.placeholder.com/400x250'}
+            alt={course.title}
+            className="detail-image"
+          />
           <div className="detail-info">
             <h1 className="detail-title">{course.title}</h1>
-            <p style={{fontSize: '1.2rem', marginBottom: '1rem'}}>{course.description}</p>
-            <p>Ocena: <strong style={{ color: '#f59e0b' }}>⭐ {course.averageRating?.toFixed(2) || 0} ({course.reviewCount || 0} ocen)</strong></p>
+            <p style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>
+              {course.description}
+            </p>
+            <p>
+              Ocena:{' '}
+              <strong style={{ color: '#f59e0b' }}>
+                ⭐ {course.averageRating?.toFixed(2) || 0} (
+                {course.reviewCount || 0} ocen)
+              </strong>
+            </p>
 
             <div className="course-action-card">
               <div className="course-price">
@@ -96,11 +115,29 @@ export default function CourseDetailPage() {
                 <span className="price-currency">PLN</span>
               </div>
               {course.isBlocked ? (
-                <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', padding: '1rem', borderRadius: '12px', textAlign: 'center', marginBottom: '1rem', color: '#ef4444', fontWeight: 600 }}>
-                  🚫 Ten kurs został zablokowany przez administratora i jest obecnie niedostępny.
+                <div
+                  style={{
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    border: '1px solid #ef4444',
+                    padding: '1rem',
+                    borderRadius: '12px',
+                    textAlign: 'center',
+                    marginBottom: '1rem',
+                    color: '#ef4444',
+                    fontWeight: 600,
+                  }}>
+                  🚫 Ten kurs został zablokowany przez administratora i jest
+                  obecnie niedostępny.
                 </div>
               ) : userRole !== 'User' ? (
-                <button className="btn btn-primary" style={{ width: '100%', marginBottom: '1rem', opacity: 0.5, cursor: 'not-allowed' }}>
+                <button
+                  className="btn btn-primary"
+                  style={{
+                    width: '100%',
+                    marginBottom: '1rem',
+                    opacity: 0.5,
+                    cursor: 'not-allowed',
+                  }}>
                   Tylko dla kursantów
                 </button>
               ) : isEnrolled ? (
@@ -130,30 +167,54 @@ export default function CourseDetailPage() {
           <h2>O czym jest ten kurs?</h2>
           <div className="description-content-wrapper">
             <p className="description-text">
-              {course.longDescription || course.description || "Brak opisu"}
+              {course.longDescription || course.description || 'Brak opisu'}
             </p>
             <div className="feature-highlights">
-              <div className="feature-tag"><div className="feature-icon">✓</div><span className="feature-text">Projekty Real-World</span></div>
-              <div className="feature-tag"><div className="feature-icon">★</div><span className="feature-text">Certyfikat Premium</span></div>
-              <div className="feature-tag"><div className="feature-icon">♾</div><span className="feature-text">Dożywotni Dostęp</span></div>
-              <div className="feature-tag"><div className="feature-icon">🗂</div><span className="feature-text">Zasoby do pobrania</span></div>
+              <div className="feature-tag">
+                <div className="feature-icon">✓</div>
+                <span className="feature-text">Projekty Real-World</span>
+              </div>
+              <div className="feature-tag">
+                <div className="feature-icon">★</div>
+                <span className="feature-text">Certyfikat Premium</span>
+              </div>
+              <div className="feature-tag">
+                <div className="feature-icon">♾</div>
+                <span className="feature-text">Dożywotni Dostęp</span>
+              </div>
+              <div className="feature-tag">
+                <div className="feature-icon">🗂</div>
+                <span className="feature-text">Zasoby do pobrania</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div style={{ background: '#fff', padding: '2rem', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-          <h3 style={{ marginBottom: '1.5rem', color: '#111827' }}>Program Kursu</h3>
+        <div
+          style={{
+            background: '#fff',
+            padding: '2rem',
+            borderRadius: '16px',
+            border: '1px solid #e2e8f0',
+          }}>
+          <h3 style={{ marginBottom: '1.5rem', color: '#111827' }}>
+            Program Kursu
+          </h3>
           <div className="module">
             <div>
               {materials.length > 0 ? (
                 materials.map((lesson) => (
                   <div key={lesson.id} className="lesson">
-                    <span>{lesson.orderIndex}. {lesson.title}</span>
+                    <span>
+                      {lesson.orderIndex}. {lesson.title}
+                    </span>
                     <span style={{ color: '#64748b' }}>[{lesson.type}]</span>
                   </div>
                 ))
               ) : (
-                <div style={{ color: '#64748b' }}>Zapisz się, by zobaczyć pełną listę materiałów.</div>
+                <div style={{ color: '#64748b' }}>
+                  Zapisz się, by zobaczyć pełną listę materiałów.
+                </div>
               )}
             </div>
           </div>
@@ -162,14 +223,54 @@ export default function CourseDetailPage() {
 
       {/* MODAL CHECKOUTU */}
       {checkoutModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ backgroundColor: '#1f2937', padding: '3rem', borderRadius: '15px', maxWidth: '500px', width: '100%', color: 'white', textAlign: 'center' }}>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}>
+          <div
+            style={{
+              backgroundColor: '#1f2937',
+              padding: '3rem',
+              borderRadius: '15px',
+              maxWidth: '500px',
+              width: '100%',
+              color: 'white',
+              textAlign: 'center',
+            }}>
             <h2 style={{ marginBottom: '1rem' }}>Podsumowanie Zamówienia</h2>
-            <p style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>{course.title} - <strong>{course.price} PLN</strong></p>
-            <p style={{ marginBottom: '2rem', color: '#f6ad55' }}>{purchaseStatus}</p>
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-              <button className="btn btn-login" onClick={() => setCheckoutModal(false)} disabled={purchaseStatus !== ''}>Anuluj</button>
-              <button className="btn btn-primary" onClick={handlePurchase} disabled={purchaseStatus !== ''}>Zatwierdź Płatność</button>
+            <p style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>
+              {course.title} - <strong>{course.price} PLN</strong>
+            </p>
+            <p style={{ marginBottom: '2rem', color: '#f6ad55' }}>
+              {purchaseStatus}
+            </p>
+            <div
+              style={{
+                display: 'flex',
+                gap: '1rem',
+                justifyContent: 'center',
+              }}>
+              <button
+                className="btn btn-login"
+                onClick={() => setCheckoutModal(false)}
+                disabled={purchaseStatus !== ''}>
+                Anuluj
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={handlePurchase}
+                disabled={purchaseStatus !== ''}>
+                Zatwierdź Płatność
+              </button>
             </div>
           </div>
         </div>
