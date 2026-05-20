@@ -63,7 +63,9 @@ services:
     restart: always
 
   order-service:
-    build: ./src/Services/Order
+    build:
+      context: .
+      dockerfile: ./src/Services/Order/Dockerfile
     container_name: order-service
     environment:
       ConnectionStrings__OrderDb: Host=database;Port=5432;Database=${POSTGRES_DB};Username=orders_user;Password=${ORDERS_DB_PASSWORD}
@@ -73,15 +75,21 @@ services:
       - rabbitmq
 
   catalog-service:
-    build: ./src/Services/Catalog
+    build:
+      context: .
+      dockerfile: ./src/Services/Catalog/Dockerfile
     container_name: catalog-service
     environment:
       ConnectionStrings__CatalogDb: Host=database;Port=5432;Database=${POSTGRES_DB};Username=catalog_user;Password=${CATALOG_DB_PASSWORD}
+      RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq
     depends_on:
       - database
+      - rabbitmq
 
   community-service:
-    build: ./src/Services/Community
+    build:
+      context: .
+      dockerfile: ./src/Services/Community/Dockerfile
     container_name: community-service
     environment:
       ConnectionStrings__CommunityDb: Host=database;Port=5432;Database=${POSTGRES_DB};Username=community_user;Password=${COMMUNITY_DB_PASSWORD}
@@ -91,7 +99,9 @@ services:
       - rabbitmq
 
   report-service:
-    build: ./src/Services/Report
+    build:
+      context: .
+      dockerfile: ./src/Services/Report/Dockerfile
     container_name: report-service
     environment:
       ConnectionStrings__ReportDb: Host=database;Port=5432;Database=${POSTGRES_DB};Username=report_user;Password=${REPORT_DB_PASSWORD}
@@ -101,7 +111,9 @@ services:
       - rabbitmq
 
   enrollment-service:
-    build: ./src/Services/Enrollment
+    build:
+      context: .
+      dockerfile: ./src/Services/Enrollment/Dockerfile
     container_name: enrollment-service
     environment:
       ConnectionStrings__EnrollmentDb: Host=database;Port=5432;Database=${POSTGRES_DB};Username=enrollment_user;Password=${ENROLLMENT_DB_PASSWORD}
@@ -111,12 +123,18 @@ services:
       - rabbitmq
 
   file-storage-service:
-    build: ./src/Services/FileStorage
+    build:
+      context: .
+      dockerfile: ./src/Services/FileStorage/Dockerfile
     container_name: file-storage-service
     volumes:
       - ./data/uploads:/app/uploads
     environment:
       ASPNETCORE_URLS: http://+:8080
+      RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq
+      CATALOG_SERVICE_URL: http://catalog-service:8080
+    depends_on:
+      - rabbitmq
     restart: always
 
 volumes:

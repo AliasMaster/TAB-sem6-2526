@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import HomePage from './pages/Home';
@@ -11,54 +10,56 @@ import About from './pages/About';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Community from './pages/Community';
-
-// Nasza nowa logika użytkownika - po angielsku
-export type Role = 'Admin' | 'Client' | 'Firm';
-
-export interface User {
-  id: number;
-  login: string;
-  email: string;
-  role: Role;
-  profilePic?: string | null; // Zdjęcie jest opcjonalne (Base64 string)
-}
+import AdminDashboard from './pages/dashboards/AdminDashboard';
+import CompanyDashboard from './pages/dashboards/CompanyDashboard';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
-  // Stan "user" zamiast "isLoggedIn"
-  const [user, setUser] = useState<User | null>(null); 
-
   return (
-    <BrowserRouter>
-      {/* Przekazujemy obiekt user i funkcję setUser */}
-      <Header user={user} setUser={setUser} /> 
-      
-      <main>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/katalog" element={<CoursePage />} />
-          <Route path="/forum" element={<Community user={user} />} />
-          
-          {/* Strona logowania dostaje funkcję setUser */}
-          <Route path="/login" element={<Login setUser={setUser} />} /> 
+    <AuthProvider>
+      <BrowserRouter>
+        <Header /> 
+        
+        <main>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/catalog" element={<CoursePage />} />
+            <Route path="/community" element={<Community />} />
+            
+            <Route path="/login" element={<Login />} /> 
+            <Route path="/register" element={<Register />} />
+            
+            <Route path="/lesson/:id" element={
+              <ProtectedRoute allowedRoles={['User', 'Admin', 'Company']}>
+                <LessonSection />
+              </ProtectedRoute>
+            } /> 
+            
+            <Route path="/course/:id" element={<CourseDetailPage />} />
+            
+            <Route path="/about" element={<About />} />
+            
+            <Route path="/profile" element={
+              <ProtectedRoute allowedRoles={['User', 'Admin', 'Company']}>
+                <Profile />
+              </ProtectedRoute>
+            } />
 
-          {/* Zostawiamy oryginalne ścieżki /nauka i /course/:id */}
-          <Route path="/nauka" element={
-            <ProtectedRoute user={user}>
-              <LessonSection />
-            </ProtectedRoute>
-          } /> 
-          <Route path="/course/:id" element={
-            <ProtectedRoute user={user}>
-              <CourseDetailPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/about" element={<About />} />
-          <Route path="/register" element={<Register setUser={setUser} />} />
-          <Route path="/profil" element={<Profile user={user} setUser={setUser} />} />
-        </Routes>
-          
-      </main>
-    </BrowserRouter>
+            <Route path="/admin" element={
+              <ProtectedRoute allowedRoles={['Admin']}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/company" element={
+              <ProtectedRoute allowedRoles={['Company']}>
+                <CompanyDashboard />
+              </ProtectedRoute>
+            } />
+          </Routes>
+        </main>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

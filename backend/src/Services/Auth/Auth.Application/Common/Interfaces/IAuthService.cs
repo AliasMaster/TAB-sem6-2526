@@ -8,4 +8,5 @@ public interface IAuthService
     Task<LoginResponse> LoginAsync(string username, string password, CancellationToken ct = default);
     Task<LoginResponse> RefreshAsync(string refreshToken, CancellationToken ct = default);
     Task RevokeAsync(string refreshToken, CancellationToken ct = default);
+    Task ChangePasswordAsync(Guid userId, string oldPassword, string newPassword, CancellationToken ct = default);
 }

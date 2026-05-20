@@ -1,83 +1,54 @@
-// src/pages/Community/Community.tsx
-import React, { useState } from 'react';
-import { CATEGORIES, type ForumThread, type Category, type ForumPost } from '../data/mockCommunity';
+import React, { useState, useEffect } from 'react';
+import api from '../api';
 import '../assets/styles/Community.css';
-import type { User } from '../App';
+import { useAuth } from '../context/AuthContext';
 
-interface CommunityProps {
-    user: User | null;
-}
+const CATEGORIES = [
+    { label: 'Wszystkie', value: -1 },
+    { label: 'Ogólne', value: 0 },
+    { label: 'Feedback', value: 1 },
+    { label: 'Wsparcie', value: 2 }
+];
 
-const Community: React.FC<CommunityProps> = ({ user }) => {
-    // Stan przechowujący wybraną kategorię
-    const [selectedCategory, setSelectedCategory] = useState<Category>('Wszystkie');
-    // Stan przechowujący wybrany wątek 
-    const [selectedThread, setSelectedThread] = useState<ForumThread | null>(null);
-    // Stan do przechowywania wątków i postów w pamięci 
-    const [threads, setThreads] = useState<ForumThread[]>([
-        {
-            thread_id: 't1',
-            author_id: 'JanKowalski',
-            title: 'Pomoc z całkami podwójnymi',
-            content: 'Cześć, czy ktoś mógłby mi wytłumaczyć, jak wyznaczyć granice całkowania w zadaniu 3 z ostatniego kursu?',
-            created_at: '2026-04-04T10:00:00Z',
-            category: 'Matematyka'
-        },
-        {
-            thread_id: 't2',
-            author_id: 'AlaNowak',
-            title: 'React vs Angular - co wybrać?',
-            content: 'Zaczynam kurs frontendowy, zastanawiam się na czym się skupić. Co polecacie na start?',
-            created_at: '2026-04-03T15:30:00Z',
-            category: 'Programowanie'
-        },
-        {
-            thread_id: 't3',
-            author_id: 'PiotrM',
-            title: 'Relacje w PostgreSQL',
-            content: 'Jak najlepiej zoptymalizować zapytanie z trzema JOINami w naszej bazie?',
-            created_at: '2026-04-04T08:15:00Z',
-            category: 'Bazy danych'
-        }
-    ]);
-    const [posts, setPosts] = useState<ForumPost[]>([
-        {
-            post_id: 'p1',
-            thread_id: 't1',
-            author_id: 'AnnaNauczyciel',
-            content: 'Musisz najpierw narysować sobie obszar całkowania. Najlepiej zacząć od zmiennej, która ma stałe granice.',
-            created_at: '2026-04-04T11:00:00Z'
-        },
-        {
-            post_id: 'p2',
-            thread_id: 't2',
-            author_id: 'WojtekDev',
-            content: 'React ma teraz większy rynek i świetne środowisko (jak np. Vite, którego używamy). Polecam Reacta!',
-            created_at: '2026-04-03T16:00:00Z'
-        }
-    ]);
-
-    // Stan do formularza tworzenia nowego wątku
+const Community: React.FC = () => {
+    const { user } = useAuth();
+    
+    const [selectedCategory, setSelectedCategory] = useState<number>(-1);
+    const [selectedThread, setSelectedThread] = useState<any>(null);
+    const [threads, setThreads] = useState<any[]>([]);
+    const [posts, setPosts] = useState<any[]>([]);
+    
     const [newThreadTitle, setNewThreadTitle] = useState('');
     const [newThreadContent, setNewThreadContent] = useState('');
-    const [newThreadCategory, setNewThreadCategory] = useState<Category>('Matematyka');
+    const [newThreadCategory, setNewThreadCategory] = useState<number>(0);
     const [showNewThreadForm, setShowNewThreadForm] = useState(false);
-
-    // Stan do formularza dodawania odpowiedzi
+    
     const [newReplyContent, setNewReplyContent] = useState('');
 
-    // Filtrowanie wątków po kategorii
-    const filteredThreads = selectedCategory === 'Wszystkie' 
-        ? threads 
-        : threads.filter(thread => thread.category === selectedCategory);
+    useEffect(() => {
+        fetchThreads();
+    }, []);
 
-    // Odpowiedzi dla wybranego wątku
-    const threadReplies = selectedThread 
-        ? posts.filter(post => post.thread_id === selectedThread.thread_id) 
-        : [];
+    const fetchThreads = async () => {
+        try {
+            const res = await api.get('/community/threads');
+            setThreads(res.data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
-    // Funkcja do tworzenia nowego wątku
-    const handleCreateThread = () => {
+    const fetchThreadDetails = async (id: string) => {
+        try {
+            const res = await api.get(`/community/threads/${id}`);
+            setSelectedThread(res.data);
+            setPosts(res.data.posts || []);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleCreateThread = async () => {
         if (!user) {
             alert('Musisz być zalogowany, aby tworzyć wątki!');
             return;
@@ -88,23 +59,22 @@ const Community: React.FC<CommunityProps> = ({ user }) => {
             return;
         }
 
-        const newThread: ForumThread = {
-            thread_id: `t${Date.now()}`,
-            author_id: user.login,
-            title: newThreadTitle,
-            content: newThreadContent,
-            created_at: new Date().toISOString(),
-            category: newThreadCategory
-        };
-
-        setThreads([newThread, ...threads]);
-        setNewThreadTitle('');
-        setNewThreadContent('');
-        setShowNewThreadForm(false);
+        try {
+            await api.post('/community/threads', {
+                title: newThreadTitle,
+                content: newThreadContent,
+                category: newThreadCategory
+            });
+            setNewThreadTitle('');
+            setNewThreadContent('');
+            setShowNewThreadForm(false);
+            fetchThreads();
+        } catch (err) {
+            console.error(err);
+        }
     };
 
-    // Funkcja do dodawania odpowiedzi
-    const handleAddReply = () => {
+    const handleAddReply = async () => {
         if (!user) {
             alert('Musisz być zalogowany, aby dodawać odpowiedzi!');
             return;
@@ -115,33 +85,36 @@ const Community: React.FC<CommunityProps> = ({ user }) => {
             return;
         }
 
-        const newPost: ForumPost = {
-            post_id: `p${Date.now()}`,
-            thread_id: selectedThread.thread_id,
-            author_id: user.login,
-            content: newReplyContent,
-            created_at: new Date().toISOString()
-        };
-
-        setPosts([...posts, newPost]);
-        setNewReplyContent('');
+        try {
+            await api.post(`/community/threads/${selectedThread.id}/posts`, {
+                content: newReplyContent
+            });
+            setNewReplyContent('');
+            fetchThreadDetails(selectedThread.id);
+        } catch (err) {
+            console.error(err);
+        }
     };
+
+    const filteredThreads = selectedCategory === -1 
+        ? threads 
+        : threads.filter(thread => thread.category === selectedCategory);
 
     return (
         <div className="community-container">
             <aside className="community-sidebar">
                 <h2>Kategorie</h2>
                 <ul>
-                    {CATEGORIES.map(category => (
+                    {CATEGORIES.map(cat => (
                         <li 
-                            key={category} 
-                            className={selectedCategory === category ? 'active' : ''}
+                            key={cat.value} 
+                            className={selectedCategory === cat.value ? 'active' : ''}
                             onClick={() => {
-                                setSelectedCategory(category);
-                                setSelectedThread(null); // Resetujemy wybrany wątek po zmianie kategorii
+                                setSelectedCategory(cat.value);
+                                setSelectedThread(null);
                             }}
                         >
-                            {category}
+                            {cat.label}
                         </li>
                     ))}
                 </ul>
@@ -156,16 +129,15 @@ const Community: React.FC<CommunityProps> = ({ user }) => {
                         
                         <div className="original-post">
                             <h1>{selectedThread.title}</h1>
-                            <p className="meta">Autor: <strong>{selectedThread.author_id}</strong> | Kategoria: {selectedThread.category}</p>
+                            <p className="meta">Kategoria: {CATEGORIES.find(c => c.value === selectedThread.category)?.label}</p>
                             <div className="content-body">{selectedThread.content}</div>
                         </div>
 
-                        <h3>Odpowiedzi ({threadReplies.length})</h3>
+                        <h3>Odpowiedzi ({posts.length})</h3>
                         <div className="replies-list">
-                            {threadReplies.length > 0 ? (
-                                threadReplies.map(reply => (
-                                    <div key={reply.post_id} className="reply-card">
-                                        <p className="meta">Odpowiedź od: <strong>{reply.author_id}</strong></p>
+                            {posts.length > 0 ? (
+                                posts.map(reply => (
+                                    <div key={reply.id} className="reply-card">
                                         <p>{reply.content}</p>
                                     </div>
                                 ))
@@ -191,7 +163,7 @@ const Community: React.FC<CommunityProps> = ({ user }) => {
                     </div>
                 ) : (
                     <div className="threads-list">
-                        <h2>Wątki: {selectedCategory}</h2>
+                        <h2>Wątki: {CATEGORIES.find(c => c.value === selectedCategory)?.label}</h2>
                         
                         {user ? (
                             <button 
@@ -216,11 +188,11 @@ const Community: React.FC<CommunityProps> = ({ user }) => {
                                 />
                                 <select
                                     value={newThreadCategory}
-                                    onChange={(e) => setNewThreadCategory(e.target.value as Category)}
+                                    onChange={(e) => setNewThreadCategory(Number(e.target.value))}
                                     className="input-category"
                                 >
-                                    {CATEGORIES.filter(cat => cat !== 'Wszystkie').map(cat => (
-                                        <option key={cat} value={cat}>{cat}</option>
+                                    {CATEGORIES.filter(cat => cat.value !== -1).map(cat => (
+                                        <option key={cat.value} value={cat.value}>{cat.label}</option>
                                     ))}
                                 </select>
                                 <textarea
@@ -236,12 +208,12 @@ const Community: React.FC<CommunityProps> = ({ user }) => {
 
                         {filteredThreads.map(thread => (
                             <div 
-                                key={thread.thread_id} 
+                                key={thread.id} 
                                 className="thread-card"
-                                onClick={() => setSelectedThread(thread)}
+                                onClick={() => fetchThreadDetails(thread.id)}
                             >
                                 <h3>{thread.title}</h3>
-                                <p className="meta">Autor: {thread.author_id} | Utworzono: {new Date(thread.created_at).toLocaleDateString()} | Odpowiedzi: {posts.filter(p => p.thread_id === thread.thread_id).length}</p>
+                                <p className="meta">Kategoria: {CATEGORIES.find(c => c.value === thread.category)?.label} | Utworzono: {new Date(thread.createdAt).toLocaleDateString()}</p>
                             </div>
                         ))}
 

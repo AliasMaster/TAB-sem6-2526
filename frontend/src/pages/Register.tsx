@@ -1,55 +1,22 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import type { User } from '../App'; // Importujemy typ User
+import { useAuth } from '../context/AuthContext';
+import api from '../api';
 
-interface RegisterProps {
-  setUser: (user: User | null) => void;
-}
-
-const Register = ({ setUser }: RegisterProps) => {
+const Register = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
-  const [isUsernameTaken, setIsUsernameTaken] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [profileImage, setProfileImage] = useState<string | null>(null);
   const [error, setError] = useState('');
 
-  const TAKEN_EMAILS = ['admin@eduforge.com', 'client@eduforge.com', 'firm@eduforge.com'];
-  const TAKEN_LOGINS = ['admin', 'client', 'firm', 'client_test', 'firm_test'];
 
-  const handleUsernameChange = (val: string) => {
-    setUsername(val);
-    if (val.length === 0) {
-      setIsUsernameTaken(false);
-      return;
-    }
-    const exists = TAKEN_LOGINS.includes(val.toLowerCase().trim());
-    setIsUsernameTaken(exists);
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
-    if (isUsernameTaken || TAKEN_EMAILS.includes(email.toLowerCase().trim())) {
-      setError("Account already exists! Use a different email or login here.");
-      return;
-    }
 
     if (password !== confirmPassword) {
       setError("Passwords don't match!");
@@ -61,21 +28,25 @@ const Register = ({ setUser }: RegisterProps) => {
       return;
     }
 
-    // --- LOGIKA AUTOMATYCZNEGO LOGOWANIA ---
-    // Tworzymy obiekt nowego użytkownika (zawsze jako Client)
-    const newUser: User = {
-      id: Date.now(), // Generujemy tymczasowe ID na podstawie czasu
-      login: username,
-      email: email,
-      role: 'Client',
-      profilePic: profileImage
-    };
+    try {
+      await api.post('/auth/register', {
+        login: username,
+        password: password
+      });
 
-    // Zapisujemy go w stanie aplikacji
-    setUser(newUser);
+      // Zaloguj od razu po rejestracji
+      const response = await api.post('/auth/login', {
+        login: username,
+        password: password
+      });
 
-    // Przekierowujemy na stronę główną
-    navigate('/'); 
+      if (response.data && response.data.accessToken) {
+        login(response.data.accessToken, response.data.refreshToken, response.data.userId);
+        navigate('/');
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Wystąpił błąd podczas rejestracji.');
+    }
   };
 
   return (
@@ -98,39 +69,17 @@ const Register = ({ setUser }: RegisterProps) => {
             <div style={styles.formColumns}>
               
               <div style={styles.leftFormColumn}>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Email Address</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@example.com"
-                    style={styles.input}
-                    required
-                  />
-                </div>
 
                 <div style={styles.inputGroup}>
                   <label style={styles.label}>Username</label>
                   <input
                     type="text"
                     value={username}
-                    onChange={(e) => handleUsernameChange(e.target.value)}
+                    onChange={(e) => setUsername(e.target.value)}
                     placeholder="e.g. MasterCoder"
-                    style={{
-                      ...styles.input,
-                      borderColor: isUsernameTaken ? '#ef4444' : (username.length > 2 ? '#22c55e' : '#e5e7eb')
-                    }}
+                    style={styles.input}
                     required
                   />
-                  {username.length > 0 && (
-                    <small style={{
-                      display: 'block', marginTop: '4px', fontWeight: '700', fontSize: '0.75rem',
-                      color: isUsernameTaken ? '#ef4444' : '#22c55e', textAlign: 'left'
-                    }}>
-                      {isUsernameTaken ? '✖ Username already taken' : '✔ Username available'}
-                    </small>
-                  )}
                 </div>
 
                 <div style={styles.inputGroup}>
@@ -159,33 +108,6 @@ const Register = ({ setUser }: RegisterProps) => {
               </div>
 
               <div style={styles.rightFormColumn}>
-                <div style={styles.photoUploadWrapper}>
-                  <label style={styles.label}>Profile Picture (Optional)</label>
-                  <div 
-                    style={{
-                      ...styles.photoPreview, 
-                      backgroundImage: profileImage ? `url(${profileImage})` : 'none' 
-                    }}
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    {!profileImage && <span style={{fontSize: '3rem', opacity: 0.3}}>+</span>}
-                  </div>
-                  <input 
-                    type="file" 
-                    ref={fileInputRef} 
-                    onChange={handleImageChange} 
-                    accept="image/*" 
-                    style={{display: 'none'}} 
-                  />
-                  <button type="button" style={styles.uploadFileBtn} onClick={() => fileInputRef.current?.click()}>
-                    {profileImage ? "Change photo" : "Choose file"}
-                  </button>
-                  {profileImage && (
-                    <button type="button" style={styles.removePhotoBtn} onClick={() => setProfileImage(null)}>
-                      Remove
-                    </button>
-                  )}
-                </div>
               </div>
             </div>
 

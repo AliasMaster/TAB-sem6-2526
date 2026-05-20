@@ -1,24 +1,22 @@
-# ETAP 1: Budowanie aplikacji (SDK)
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# Kopiujemy plik projektu i przywracamy zależności NuGet
-COPY ["EnrollmentService.csproj", "./"]
-RUN dotnet restore "EnrollmentService.csproj"
+COPY ["src/Services/Enrollment/Enrollment.API/Enrollment.API.csproj", "src/Services/Enrollment/Enrollment.API/"]
+COPY ["src/Services/Enrollment/Enrollment.Domain/Enrollment.Domain.csproj", "src/Services/Enrollment/Enrollment.Domain/"]
+COPY ["src/Services/Enrollment/Enrollment.Application/Enrollment.Application.csproj", "src/Services/Enrollment/Enrollment.Application/"]
+COPY ["src/Services/Enrollment/Enrollment.Infrastructure/Enrollment.Infrastructure.csproj", "src/Services/Enrollment/Enrollment.Infrastructure/"]
+COPY ["src/Shared/Shared.Events/Shared.Events.csproj", "src/Shared/Shared.Events/"]
 
-# Kopiujemy resztę plików źródłowych i budujemy projekt
+RUN dotnet restore "src/Services/Enrollment/Enrollment.API/Enrollment.API.csproj"
+
 COPY . .
-RUN dotnet build "EnrollmentService.csproj" -c Release -o /app/build
 
-# ETAP 2: Publikacja aplikacji
-FROM build AS publish
-RUN dotnet publish "EnrollmentService.csproj" -c Release -o /app/publish /p:UseAppHost=false
+WORKDIR "/src/src/Services/Enrollment/Enrollment.API"
+RUN dotnet build "Enrollment.API.csproj" -c Release -o /app/build
+RUN dotnet publish "Enrollment.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-# ETAP 3: Obraz finalny (Runtime) - bardzo lekki
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
-
-# .NET 8 domyślnie nasłuchuje na porcie 8080
+COPY --from=build /app/publish .
 EXPOSE 8080
-ENTRYPOINT ["dotnet", "EnrollmentService.dll"]
+ENTRYPOINT ["dotnet", "Enrollment.API.dll"]

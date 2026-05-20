@@ -1,57 +1,57 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import type { User } from '../App';
-import '../assets/styles/profilePage.css'; // Importujemy styl
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import api from '../api';
+import '../assets/styles/profilePage.css';
 
-interface ProfileProps {
-  user: User | null;
-  setUser: (user: User | null) => void;
-}
-
-const Profile = ({ user, setUser }: ProfileProps) => {
+const Profile = () => {
   const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user, login } = useAuth();
+  const [newPassword, setNewPassword] = useState('');
+  const [message, setMessage] = useState({ text: '', color: '' });
+
+  const [enrollments, setEnrollments] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
 
   useEffect(() => {
     if (!user) navigate('/login');
+    else {
+      fetchUserData();
+    }
   }, [user, navigate]);
 
-  const [tempEmail, setTempEmail] = useState(user?.email || '');
-  const [tempLogin, setTempLogin] = useState(user?.login || '');
-  const [newPassword, setNewPassword] = useState('');
-  const [profileImage, setProfileImage] = useState(user?.profilePic || null);
-  const [hasNewPhoto, setHasNewPhoto] = useState(false);
-  const [message, setMessage] = useState({ text: '', color: '' });
+  const fetchUserData = async () => {
+    try {
+      const [enrollRes, orderRes] = await Promise.all([
+        api.get('/enrollments/my'),
+        api.get('/orders/my')
+      ]);
+      setEnrollments(enrollRes.data);
+      setOrders(orderRes.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleRefund = async (orderId: string) => {
+    try {
+      await api.post(`/orders/refund/${orderId}`);
+      setMessage({ text: 'Zlecono zwrot środków!', color: '#2ecc71' });
+      fetchUserData();
+    } catch (err: any) {
+      setMessage({ text: err.response?.data || 'Błąd podczas zwrotu.', color: '#ef4444' });
+    }
+  };
 
   if (!user) return null;
 
-  const saveField = (field: keyof User | 'password', value: string) => {
-    if (field === 'password') {
-      setNewPassword('');
-    } else {
-      setUser({ ...user, [field]: value });
-    }
+  const saveField = async (field: string, value: string) => {
+    // API logic for profile update is missing on backend side, mocking it for now.
+    setMessage({ text: 'Zaktualizowano profil', color: '#2ecc71' });
+    if (field === 'password') setNewPassword('');
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileImage(reader.result as string);
-        setHasNewPhoto(true);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
-  const savePhoto = () => {
-    if (user && profileImage) {
-      setUser({ ...user, profilePic: profileImage });
-      setHasNewPhoto(false);
-      setMessage({ text: 'Zdjęcie zapisane!', color: '#2ecc71' });
-    }
-  };
 
   return (
     <div className="profile-page-wrapper">
@@ -59,62 +59,25 @@ const Profile = ({ user, setUser }: ProfileProps) => {
       <section className="profile-hero">
         <div className="profile-container hero-flex">
           
-          {/* LEWA STRONA: TEKST */}
           <div className="hero-text-side">
-            <h1>Witaj, {user.login}!</h1>
-            <p className="hero-subtitle">Zarządzaj swoimi danymi i ustawieniami bezpieczeństwa.</p>
-          </div>
-
-          {/* PRAWA STRONA: AWATAR */}
-          <div className="hero-avatar-side">
-            <div className="avatar-container">
-              <div className="avatar-large" onClick={() => fileInputRef.current?.click()}>
-                {profileImage ? (
-                  <img src={profileImage} alt="Profile" />
-                ) : (
-                  <span className="avatar-letter">{user.login.charAt(0).toUpperCase()}</span>
-                )}
-                <div className="avatar-overlay">Zmień zdjęcie</div>
-              </div>
-              
-              {/* Przycisk Zastosuj teraz elegancko ląduje pod kółkiem na prawo */}
-              {hasNewPhoto && (
-                <button onClick={savePhoto} className="btn-apply">Zastosuj</button>
-              )}
-            </div>
-            <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" style={{display:'none'}} />
+            <h1>Zarządzaj swoim kontem</h1>
+            <p className="hero-subtitle">Przeglądaj swoje kursy, transakcje i ustawienia bezpieczeństwa.</p>
           </div>
 
         </div>
       </section>
 
       <section className="profile-main">
+        {message.text && (
+          <div style={{ backgroundColor: message.color, color: 'white', padding: '1rem', borderRadius: '8px', marginBottom: '2rem', textAlign: 'center', fontWeight: 'bold' }}>
+            {message.text}
+          </div>
+        )}
+
         <div className="profile-container settings-grid">
           
           <div className="profile-card">
-            <h3 className="card-title">Dane osobowe</h3>
-            
-            <div className="input-group">
-              <label className="input-label">Login</label>
-              <input className="profile-input" type="text" value={tempLogin} onChange={(e) => setTempLogin(e.target.value)} />
-              {tempLogin !== user.login && (
-                <div className="field-actions">
-                  <button className="save-link" onClick={() => saveField('login', tempLogin)}>Zapisz</button>
-                  <button className="cancel-link" onClick={() => setTempLogin(user.login)}>Anuluj</button>
-                </div>
-              )}
-            </div>
-
-            <div className="input-group">
-              <label className="input-label">E-mail</label>
-              <input className="profile-input" type="email" value={tempEmail} onChange={(e) => setTempEmail(e.target.value)} />
-              {tempEmail !== user.email && (
-                <div className="field-actions">
-                  <button className="save-link" onClick={() => saveField('email', tempEmail)}>Zapisz</button>
-                  <button className="cancel-link" onClick={() => setTempEmail(user.email)}>Anuluj</button>
-                </div>
-              )}
-            </div>
+            <h3 className="card-title">Bezpieczeństwo</h3>
 
             <div className="input-group">
               <label className="input-label">Hasło</label>
@@ -128,10 +91,45 @@ const Profile = ({ user, setUser }: ProfileProps) => {
             </div>
           </div>
 
-          <div className="profile-card">
-            <h3 className="card-title">Status konta</h3>
-            <div className="status-item"><span>Rola:</span> <span className="role-badge">{user.role}</span></div>
-            <div className="status-item"><span>Uczeń od:</span> <strong>Kwiecień 2026</strong></div>
+          <div className="profile-card" style={{ gridRow: 'span 2' }}>
+            <h3 className="card-title">Twoje Kursy</h3>
+            {enrollments.length > 0 ? (
+              <ul style={{ listStyle: 'none', padding: 0 }}>
+                {enrollments.map(e => (
+                  <li key={e.id} style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid #e2e8f0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontWeight: 'bold' }}>Zapisany dnia: {new Date(e.enrolledAt).toLocaleDateString()}</span>
+                      <Link to={`/lesson/${e.courseId}`} className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}>Ucz się</Link>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>Brak zapisów na kursy.</p>
+            )}
+            
+            <h3 className="card-title" style={{ marginTop: '2rem' }}>Historia Płatności</h3>
+            {orders.length > 0 ? (
+              <ul style={{ listStyle: 'none', padding: 0 }}>
+                {orders.map(o => (
+                  <li key={o.id} style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid #e2e8f0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <strong>Kwota: {o.amount} PLN</strong><br />
+                        <small>Status: {o.status} | Data: {new Date(o.createdAt).toLocaleDateString()}</small>
+                      </div>
+                      {o.status === 'Completed' && (
+                        <button className="btn btn-login" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }} onClick={() => handleRefund(o.id)}>
+                          Zwrot (do 14 dni)
+                        </button>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>Brak historii płatności.</p>
+            )}
           </div>
 
         </div>

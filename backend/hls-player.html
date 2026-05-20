@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure HLS Video Player | E-Learning Platform</title>
+    <!-- Import beautiful font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Load HLS.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        :root {
+            --bg-color: #0f0c1b;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-color: #f1ecff;
+            --accent-color: #a855f7;
+            --accent-gradient: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 40%);
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 350px 1fr;
+            }
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            color: #a78bfa;
+            font-size: 1rem;
+            font-weight: 300;
+        }
+
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #c084fc;
+        }
+
+        .input-group input, .input-group textarea {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-size: 0.8rem;
+        }
+
+        .btn-play {
+            background: var(--accent-gradient);
+            border: none;
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 14px 0 rgba(168, 85, 247, 0.4);
+            margin-top: 0.5rem;
+        }
+
+        .btn-play:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(236, 72, 153, 0.6);
+        }
+
+        .btn-play:active {
+            transform: translateY(0);
+        }
+
+        .player-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            position: relative;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+
+        .placeholder-message {
+            text-align: center;
+            padding: 2rem;
+            color: #8b5cf6;
+        }
+
+        .placeholder-message svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1rem;
+            stroke: currentColor;
+            fill: none;
+        }
+
+        .error-banner {
+            display: none;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            color: #fca5a5;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Secure Adaptive HLS Player</h1>
+            <p>E-Learning Secured Platform Video Transcoding Verification</p>
+        </div>
+
+        <div class="controls-panel">
+            <div class="input-group">
+                <label for="gatewayUrl">Gateway API Base</label>
+                <input type="text" id="gatewayUrl" value="http://localhost/api">
+            </div>
+
+            <div class="input-group">
+                <label for="courseId">Course ID</label>
+                <input type="text" id="courseId" placeholder="e.g. 11111111-1111-1111-1111-111111111111">
+            </div>
+
+            <div class="input-group">
+                <label for="lessonId">Lesson ID</label>
+                <input type="text" id="lessonId" value="66666666-6666-6666-6666-666666666666">
+            </div>
+
+            <div class="input-group">
+                <label for="token">Bearer JWT Token</label>
+                <textarea id="token" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."></textarea>
+            </div>
+
+            <button class="btn-play" id="btnPlay">Stream Secure Video</button>
+        </div>
+
+        <div class="player-panel">
+            <div class="placeholder-message" id="placeholder">
+                <svg viewBox="0 0 24 24" stroke-width="1.5">
+                    <circle cx="12" cy="12" r="10" />
+                    <polygon points="10 8 16 12 10 16 10 8" />
+                </svg>
+                <h3>Ready to stream</h3>
+                <p>Provide access credentials and click "Stream Secure Video"</p>
+            </div>
+            <video id="video" controls></video>
+        </div>
+
+        <div class="error-banner" id="errorBanner"></div>
+    </div>
+
+    <script>
+        const btnPlay = document.getElementById('btnPlay');
+        const video = document.getElementById('video');
+        const placeholder = document.getElementById('placeholder');
+        const errorBanner = document.getElementById('errorBanner');
+
+        let hlsInstance = null;
+
+        btnPlay.addEventListener('click', () => {
+            const gatewayUrl = document.getElementById('gatewayUrl').value.trim();
+            const courseId = document.getElementById('courseId').value.trim();
+            const lessonId = document.getElementById('lessonId').value.trim();
+            const token = document.getElementById('token').value.trim();
+
+            errorBanner.style.display = 'none';
+
+            if (!courseId || !lessonId || !token) {
+                showError("Please enter Course ID, Lesson ID, and Bearer JWT Token.");
+                return;
+            }
+
+            // Destroy previous HLS instance if exists
+            if (hlsInstance) {
+                hlsInstance.destroy();
+                hlsInstance = null;
+            }
+
+            // Target secure proxy URL
+            const hlsUrl = `${gatewayUrl}/courses/${courseId}/lessons/${lessonId}/content/`;
+
+            if (Hls.isSupported()) {
+                hlsInstance = new Hls({
+                    xhrSetup: function (xhr, url) {
+                        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+                    }
+                });
+
+                hlsInstance.loadSource(hlsUrl);
+                hlsInstance.attachMedia(video);
+
+                hlsInstance.on(Hls.Events.MANIFEST_PARSED, function () {
+                    placeholder.style.display = 'none';
+                    video.style.display = 'block';
+                    video.play().catch(e => console.log("Auto-play blocked by browser. Click play to start."));
+                });
+
+                hlsInstance.on(Hls.Events.ERROR, function (event, data) {
+                    console.error("HLS Error:", data);
+                    const statusCode = data.response ? data.response.status : null;
+                    if (statusCode === 403) {
+                        showError("Access Denied (403): Token is either expired, invalid, or you are not authorized (enrolled) to view this content.");
+                    } else if (statusCode === 404) {
+                        showError("Not Found (404): Video stream is not transcoded or course/lesson does not exist.");
+                    } else {
+                        showError(`Streaming Error: ${data.details || 'Unknown error'} (Status: ${statusCode || 'CORS or Network Refused'})`);
+                    }
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                // Support for Safari/Native HLS
+                // In Safari we must pass the token in the URL or cookies since native player doesn't expose headers easily
+                // For native Safari we stream directly
+                video.src = hlsUrl;
+                placeholder.style.display = 'none';
+                video.style.display = 'block';
+                video.play();
+            } else {
+                showError("Your browser does not support HLS.js (adaptive media streaming).");
+            }
+        });
+
+        function showError(message) {
+            errorBanner.textContent = message;
+            errorBanner.style.display = 'block';
+            video.style.display = 'none';
+            placeholder.style.display = 'flex';
+        }
+    </script>
+</body>
+</html>

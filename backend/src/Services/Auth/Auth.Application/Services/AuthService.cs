@@ -146,4 +146,21 @@ public class AuthService : IAuthService
             ExpiresAt = DateTime.UtcNow.AddMinutes(accessTokenExpiryMinutes)
         };
     }
+
+    public async Task ChangePasswordAsync(Guid userId, string oldPassword, string newPassword, CancellationToken ct = default)
+    {
+        var user = await _userRepository.GetByIdAsync(userId, ct);
+        if (user == null)
+        {
+            throw new KeyNotFoundException("User not found.");
+        }
+
+        if (!_passwordHasher.Verify(oldPassword, user.PasswordHash))
+        {
+            throw new InvalidCredentialsException();
+        }
+
+        user.PasswordHash = _passwordHasher.HashPassword(newPassword);
+        await _unitOfWork.SaveChangesAsync(ct);
+    }
 }

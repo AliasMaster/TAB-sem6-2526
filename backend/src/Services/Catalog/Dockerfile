@@ -1,24 +1,21 @@
-# ETAP 1: Budowanie aplikacji (SDK)
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# Kopiujemy plik projektu i przywracamy zależności NuGet
-COPY ["CatalogService.csproj", "./"]
-RUN dotnet restore "CatalogService.csproj"
+COPY ["src/Services/Catalog/Catalog.API/Catalog.API.csproj", "src/Services/Catalog/Catalog.API/"]
+COPY ["src/Services/Catalog/Catalog.Domain/Catalog.Domain.csproj", "src/Services/Catalog/Catalog.Domain/"]
+COPY ["src/Services/Catalog/Catalog.Application/Catalog.Application.csproj", "src/Services/Catalog/Catalog.Application/"]
+COPY ["src/Services/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj", "src/Services/Catalog/Catalog.Infrastructure/"]
 
-# Kopiujemy resztę plików źródłowych i budujemy projekt
+RUN dotnet restore "src/Services/Catalog/Catalog.API/Catalog.API.csproj"
+
 COPY . .
-RUN dotnet build "CatalogService.csproj" -c Release -o /app/build
 
-# ETAP 2: Publikacja aplikacji
-FROM build AS publish
-RUN dotnet publish "CatalogService.csproj" -c Release -o /app/publish /p:UseAppHost=false
+WORKDIR "/src/src/Services/Catalog/Catalog.API"
+RUN dotnet build "Catalog.API.csproj" -c Release -o /app/build
+RUN dotnet publish "Catalog.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-# ETAP 3: Obraz finalny (Runtime) - bardzo lekki
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
-
-# .NET 8 domyślnie nasłuchuje na porcie 8080
+COPY --from=build /app/publish .
 EXPOSE 8080
-ENTRYPOINT ["dotnet", "CatalogService.dll"]
+ENTRYPOINT ["dotnet", "Catalog.API.dll"]
