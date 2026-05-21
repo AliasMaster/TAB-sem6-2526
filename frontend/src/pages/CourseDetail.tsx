@@ -88,7 +88,7 @@ export default function CourseDetailPage() {
   }
 
   return (
-    <div>
+    <div className="course-detail-page-wrapper">
       <section className="detail-hero">
         <div className="container detail-hero-content">
           <img

@@ -19,8 +19,6 @@ public class CatalogDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.HasPostgresEnum<CourseStatus>("course_status");
-
         modelBuilder.Entity<Course>(entity =>
         {
             entity.ToTable("courses", "catalog");

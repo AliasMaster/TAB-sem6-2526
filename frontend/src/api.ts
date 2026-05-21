@@ -29,8 +29,8 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Avoid infinite loops if refresh token itself fails
-    if (error.response?.status === 401 && !originalRequest._retry && originalRequest.url !== '/auth/refresh') {
+    // Avoid infinite loops if refresh token itself fails, and don't intercept login/register attempts
+    if (error.response?.status === 401 && !originalRequest._retry && originalRequest.url !== '/auth/refresh' && originalRequest.url !== '/auth/login' && originalRequest.url !== '/auth/register') {
       originalRequest._retry = true;
       const refreshToken = localStorage.getItem('refreshToken');
       const userId = localStorage.getItem('userId');

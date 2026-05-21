@@ -16,8 +16,6 @@ public class CommunityDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.HasPostgresEnum<CommunityService.Domain.Enums.ThreadCategory>("thread_category");
-
         modelBuilder.Entity<CommunityService.Domain.Entities.Thread>(entity =>
         {
             entity.ToTable("threads", "community");
@@ -28,6 +26,10 @@ public class CommunityDbContext : DbContext
             entity.Property(e => e.AuthorId).HasColumnName("author_id");
             entity.Property(e => e.Category).HasColumnName("category");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+
+            entity.HasOne(t => t.Author)
+                .WithMany()
+                .HasForeignKey(t => t.AuthorId);
         });
 
         modelBuilder.Entity<Post>(entity =>
@@ -43,6 +45,18 @@ public class CommunityDbContext : DbContext
             entity.HasOne(p => p.Thread)
                 .WithMany(t => t.Posts)
                 .HasForeignKey(p => p.ThreadId);
+
+            entity.HasOne(p => p.Author)
+                .WithMany()
+                .HasForeignKey(p => p.AuthorId);
+        });
+
+        modelBuilder.Entity<AuthUser>(entity =>
+        {
+            entity.ToTable("users", "auth");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Login).HasColumnName("login");
         });
     }
 }

@@ -345,8 +345,15 @@ export default function AdminDashboard() {
                       <tr key={course.id} style={{ borderBottom: '1px solid #1e293b', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
                         <td style={{ padding: '1rem', color: '#f1f5f9', fontWeight: 500 }}>{course.title}</td>
                         <td style={{ padding: '1rem' }}>
-                          <span style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600, backgroundColor: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}>
-                            {course.status === 0 ? 'Active' : course.status}
+                          <span style={{ 
+                            padding: '4px 8px', 
+                            borderRadius: '4px', 
+                            fontSize: '0.8rem', 
+                            fontWeight: 600, 
+                            backgroundColor: (course.status === 0 || course.status === 'Active' || course.status === '0') ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)', 
+                            color: (course.status === 0 || course.status === 'Active' || course.status === '0') ? '#10b981' : '#ef4444' 
+                          }}>
+                            {(course.status === 0 || course.status === 'Active' || course.status === '0') ? 'Active' : 'Inactive'}
                           </span>
                         </td>
                         <td style={{ padding: '1rem', textAlign: 'center' }}>

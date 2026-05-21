@@ -12,7 +12,7 @@ public class Course
     public decimal Price { get; set; }
     public string? ImageUrl { get; set; }
     public Guid AuthorId { get; set; }
-    public CourseStatus Status { get; set; } = CourseStatus.Inactive;
+    public CourseStatus Status { get; set; } = CourseStatus.Active;
     public bool IsBlocked { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

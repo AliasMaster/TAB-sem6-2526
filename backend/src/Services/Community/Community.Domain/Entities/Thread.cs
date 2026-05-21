@@ -13,4 +13,5 @@ public class Thread
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public ICollection<Post> Posts { get; set; } = new List<Post>();
+    public AuthUser? Author { get; set; }
 }

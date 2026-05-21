@@ -41,7 +41,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
         title VARCHAR(255) NOT NULL,
         author_id UUID NOT NULL REFERENCES auth.users(id),
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        category thread_category NOT NULL
+        category INTEGER DEFAULT 0
     );
 
     CREATE TABLE community.posts (
@@ -60,7 +60,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
         description TEXT,
         price DECIMAL(10, 2) NOT NULL,
         image_url TEXT,
-        status course_status NOT NULL,
+        status INTEGER NOT NULL,
         is_blocked BOOLEAN NOT NULL DEFAULT FALSE,
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
@@ -121,60 +121,77 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     INSERT INTO auth.users (id, login, password_hash, role) VALUES 
     ('11111111-1111-1111-1111-111111111111', 'admin', '\$2a\$11\$uroIZtECDzGg3fe24LCLxebVOZbqvEhP0pd7YFzcs6Ernthc3mIDK', 'admin'),
     ('22222222-2222-2222-2222-222222222222', 'company', '\$2a\$11\$6Z501vaz5w57TIOWiBiz6e3LCme/wVPqViAEqE2pdSoBJZvq4G9sC', 'company'),
-    ('33333333-3333-3333-3333-333333333333', 'student', '\$2a\$11\$DqyT3NRfWD5XcFVWNm1QzeSB/TAzmGEesBEW.MpP7owVoo2By1ucW', 'user');
+    ('33333333-3333-3333-3333-333333333333', 'student', '\$2a\$11\$DqyT3NRfWD5XcFVWNm1QzeSB/TAzmGEesBEW.MpP7owVoo2By1ucW', 'user'),
+    ('d1ae305b-1cc4-41ea-9dbf-d7c7c3499db0', 'student2', '\$2a\$11\$cofiwwXt89NTweH7eouWmeC7l/flm4aviDYZVQSCC25ubL4gR28uu', 'user');
 
     INSERT INTO auth.refresh_tokens (id, user_id, token_hash, expires_at, is_revoked) VALUES
     ('99999999-9999-9999-9999-999999999999', '33333333-3333-3333-3333-333333333333', 'dummy_token_hash_student_1', CURRENT_TIMESTAMP + INTERVAL '7 days', false),
     ('99999999-9999-9999-9999-999999999998', '22222222-2222-2222-2222-222222222222', 'dummy_token_hash_company_1', CURRENT_TIMESTAMP + INTERVAL '7 days', false),
     ('99999999-9999-9999-9999-999999999997', '11111111-1111-1111-1111-111111111111', 'dummy_token_hash_admin_1', CURRENT_TIMESTAMP + INTERVAL '7 days', false);
 
-    INSERT INTO community.threads (id, content, title, author_id, category) VALUES
-    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Jakie IDE polecacie do C#?', 'Pierwsze kroki', '33333333-3333-3333-3333-333333333333', 'general'),
-    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1', 'Problem z kompilacją', 'Pomoc z kodem', '33333333-3333-3333-3333-333333333333', 'support'),
-    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2', 'Prośba o nowy kurs z Pythona', 'Sugestia kursu', '33333333-3333-3333-3333-333333333333', 'feedback');
+    INSERT INTO community.threads (id, content, title, author_id, created_at, category) VALUES
+    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Jakie IDE polecacie do C#?', 'Pierwsze kroki', '33333333-3333-3333-3333-333333333333', '2026-05-20 11:52:23.814213', 0),
+    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1', 'Problem z kompilacją', 'Pomoc z kodem', '33333333-3333-3333-3333-333333333333', '2026-05-20 11:52:23.814213', 0),
+    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2', 'Prośba o nowy kurs z Pythona', 'Sugestia kursu', '33333333-3333-3333-3333-333333333333', '2026-05-20 11:52:23.814213', 0),
+    ('da1adce1-bb57-47b2-afc9-f1e749c67149', 'Cos tam', 'Cos tam', '22222222-2222-2222-2222-222222222222', '2026-05-20 23:26:26.961206', 2);
 
-    INSERT INTO community.posts (id, thread_id, content, author_id) VALUES
-    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Zdecydowanie Visual Studio lub Rider!', '22222222-2222-2222-2222-222222222222'),
-    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Dzięki za polecenie!', '33333333-3333-3333-3333-333333333333'),
-    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb2', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1', 'Pokaż logi błędu, spróbujemy pomóc.', '22222222-2222-2222-2222-222222222222');
+    INSERT INTO community.posts (id, thread_id, content, created_at, author_id) VALUES
+    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Zdecydowanie Visual Studio lub Rider!', '2026-05-20 11:52:23.815274', '22222222-2222-2222-2222-222222222222'),
+    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Dzięki za polecenie!', '2026-05-20 11:52:23.815274', '33333333-3333-3333-3333-333333333333'),
+    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb2', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1', 'Pokaż logi błędu, spróbujemy pomóc.', '2026-05-20 11:52:23.815274', '22222222-2222-2222-2222-222222222222'),
+    ('374a5655-d36f-4042-bc9d-897096e75a2f', 'da1adce1-bb57-47b2-afc9-f1e749c67149', 'Halo', '2026-05-20 23:26:33.870092', '22222222-2222-2222-2222-222222222222'),
+    ('2a54dee5-b1eb-4ee0-b199-c4ba213f49be', 'da1adce1-bb57-47b2-afc9-f1e749c67149', 'Czesc', '2026-05-21 06:34:23.257946', 'd1ae305b-1cc4-41ea-9dbf-d7c7c3499db0');
 
-    INSERT INTO catalog.courses (id, author_id, title, description, price, image_url, status) VALUES 
-    ('44444444-4444-4444-4444-444444444444', '22222222-2222-2222-2222-222222222222', 'Podstawy programowania w C#', 'Praktyczny kurs programowania w języku C# od podstaw', 99.00, 'https://picsum.photos/seed/csharp/800/600', 'active'),
-    ('44444444-4444-4444-4444-444444444445', '22222222-2222-2222-2222-222222222222', 'Zaawansowany C#', 'Delegaty, eventy, LINQ', 149.00, 'https://picsum.photos/seed/csharp2/800/600', 'active'),
-    ('44444444-4444-4444-4444-444444444446', '22222222-2222-2222-2222-222222222222', 'Wzorce Projektowe', 'Wzorce kreacyjne, strukturalne', 199.00, 'https://picsum.photos/seed/patterns/800/600', 'active');
+    INSERT INTO catalog.courses (id, author_id, title, description, price, image_url, status, is_blocked, created_at) VALUES 
+    ('44444444-4444-4444-4444-444444444446', '22222222-2222-2222-2222-222222222222', 'Wzorce Projektowe', 'Wzorce kreacyjne, strukturalne', 199.00, 'https://picsum.photos/seed/patterns/800/600', 0, false, '2026-05-20 11:52:23.816578'),
+    ('44444444-4444-4444-4444-444444444445', '22222222-2222-2222-2222-222222222222', 'Zaawansowany C#', 'Delegaty, eventy, LINQ', 149.00, 'https://picsum.photos/seed/csharp2/800/600', 0, false, '2026-05-20 11:52:23.816578'),
+    ('fad5123e-1652-43d6-b24a-5f033b1dbb79', '22222222-2222-2222-2222-222222222222', 'dsdasasd', 'dsaadsdas', 4.00, 'dasasdasd', 0, false, '2026-05-20 13:54:50.441341'),
+    ('104cc841-f2f0-43b0-9e97-bf965d575fc9', '22222222-2222-2222-2222-222222222222', 'gg', 'gg', 2.00, 'g', 1, false, '2026-05-20 23:30:47.140467'),
+    ('44444444-4444-4444-4444-444444444444', '22222222-2222-2222-2222-222222222222', 'Podstawy programowania w C#', 'Praktyczny kurs programowania w języku C# od podstaw', 99.00, 'https://picsum.photos/seed/csharp/800/600', 1, false, '2026-05-20 11:52:23.816578');
 
-    INSERT INTO catalog.course_accesses (user_id, course_id) VALUES
-    ('33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444444'),
-    ('33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444445'),
-    ('33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444446');
+    INSERT INTO catalog.course_accesses (user_id, course_id, granted_at) VALUES
+    ('33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444444', '2026-05-20 11:52:23.81762'),
+    ('33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444445', '2026-05-20 11:52:23.81762'),
+    ('33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444446', '2026-05-20 11:52:23.81762'),
+    ('33333333-3333-3333-3333-333333333333', 'fad5123e-1652-43d6-b24a-5f033b1dbb79', '2026-05-20 14:52:00.883167'),
+    ('d1ae305b-1cc4-41ea-9dbf-d7c7c3499db0', '44444444-4444-4444-4444-444444444445', '2026-05-21 06:32:35.803281'),
+    ('d1ae305b-1cc4-41ea-9dbf-d7c7c3499db0', 'fad5123e-1652-43d6-b24a-5f033b1dbb79', '2026-05-21 06:32:51.287439');
 
     INSERT INTO catalog.lessons (id, course_id, title, content_url, order_index) VALUES 
-    ('66666666-6666-6666-6666-666666666666', '44444444-4444-4444-4444-444444444444', 'Wprowadzenie do kursu', 'intro.mp4', 1),
     ('77777777-7777-7777-7777-777777777777', '44444444-4444-4444-4444-444444444444', 'Instalacja środowiska', 'setup.mp4', 2),
     ('66666666-6666-6666-6666-666666666667', '44444444-4444-4444-4444-444444444445', 'Czym są delegaty?', 'delegates.mp4', 1),
-    ('66666666-6666-6666-6666-666666666668', '44444444-4444-4444-4444-444444444446', 'Wzorzec Singleton', 'singleton.mp4', 1);
+    ('66666666-6666-6666-6666-666666666668', '44444444-4444-4444-4444-444444444446', 'Wzorzec Singleton', 'singleton.mp4', 1),
+    ('66666666-6666-6666-6666-666666666666', '44444444-4444-4444-4444-444444444444', 'Wprowadzenie do kursu', 'c0b102f7-700b-41cf-af36-5d5bc51a6c77/index.m3u8', 1),
+    ('2747fbfd-06cf-4add-855a-993013848df7', 'fad5123e-1652-43d6-b24a-5f033b1dbb79', '[Text] BB', E'**Siema**\n', 1),
+    ('46f048d3-b14b-4d2b-8480-f038263f1edf', 'fad5123e-1652-43d6-b24a-5f033b1dbb79', '[Video] Kocham gotować', 'de5f742e-b228-4f98-957a-4c65024c3ace/index.m3u8', 3),
+    ('6fe1b953-09ce-48f8-b8cc-767a942784fd', 'fad5123e-1652-43d6-b24a-5f033b1dbb79', '[Document] 432', 'a4409c47-792f-4b6a-b785-03ee51ee9ce1/a4409c47-792f-4b6a-b785-03ee51ee9ce1.pdf', 2);
 
-    INSERT INTO catalog.progress (id, user_id, lesson_id, is_completed) VALUES
-    ('cccccccc-cccc-cccc-cccc-cccccccccccc', '33333333-3333-3333-3333-333333333333', '66666666-6666-6666-6666-666666666666', true),
-    ('cccccccc-cccc-cccc-cccc-ccccccccccc1', '33333333-3333-3333-3333-333333333333', '77777777-7777-7777-7777-777777777777', false),
-    ('cccccccc-cccc-cccc-cccc-ccccccccccc2', '33333333-3333-3333-3333-333333333333', '66666666-6666-6666-6666-666666666667', true);
+    INSERT INTO catalog.progress (id, user_id, lesson_id, is_completed, last_accessed) VALUES
+    ('cccccccc-cccc-cccc-cccc-ccccccccccc1', '33333333-3333-3333-3333-333333333333', '77777777-7777-7777-7777-777777777777', true, '2026-05-20 13:01:32.461359'),
+    ('cccccccc-cccc-cccc-cccc-cccccccccccc', '33333333-3333-3333-3333-333333333333', '66666666-6666-6666-6666-666666666666', true, '2026-05-20 13:01:33.716294'),
+    ('cccccccc-cccc-cccc-cccc-ccccccccccc2', '33333333-3333-3333-3333-333333333333', '66666666-6666-6666-6666-666666666667', true, '2026-05-20 13:02:13.028476'),
+    ('9be6339d-5e59-452e-8bcb-52267d744d5a', '33333333-3333-3333-3333-333333333333', '46f048d3-b14b-4d2b-8480-f038263f1edf', true, '2026-05-20 15:00:03.433821'),
+    ('3bd0ffc2-5fd4-480b-a376-8e8c16f3cf9d', '33333333-3333-3333-3333-333333333333', '2747fbfd-06cf-4add-855a-993013848df7', true, '2026-05-20 15:00:05.056201'),
+    ('c8ffbe6b-38d9-4d67-8d82-49f4debbc435', '33333333-3333-3333-3333-333333333333', '6fe1b953-09ce-48f8-b8cc-767a942784fd', true, '2026-05-20 15:00:07.283065');
 
-    INSERT INTO catalog.reviews (id, user_id, course_id, rating, comment) VALUES
-    ('dddddddd-dddd-dddd-dddd-dddddddddddd', '33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444444', 5, 'Świetny kurs dla początkujących!'),
-    ('dddddddd-dddd-dddd-dddd-ddddddddddd1', '33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444445', 4, 'Trudny, ale warto'),
-    ('dddddddd-dddd-dddd-dddd-ddddddddddd2', '33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444446', 5, 'Wzorce fajnie wytłumaczone');
+    INSERT INTO catalog.reviews (id, user_id, course_id, rating, comment, created_at) VALUES
+    ('dddddddd-dddd-dddd-dddd-dddddddddddd', '33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444444', 5, 'Świetny kurs dla początkujących!', '2026-05-20 11:52:23.820616'),
+    ('dddddddd-dddd-dddd-dddd-ddddddddddd1', '33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444445', 4, 'Trudny, ale warto', '2026-05-20 11:52:23.820616'),
+    ('dddddddd-dddd-dddd-dddd-ddddddddddd2', '33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444446', 5, 'Wzorce fajnie wytłumaczone', '2026-05-20 11:52:23.820616'),
+    ('c6313cef-a2d0-4ad7-8c5f-24aaa09c9b95', '33333333-3333-3333-3333-333333333333', 'fad5123e-1652-43d6-b24a-5f033b1dbb79', 3, '', '2026-05-20 15:00:09.7058');
 
-    INSERT INTO orders.payments (id, user_id, course_id, amount, status) VALUES
-    ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', '33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444444', 99.00, 'completed'),
-    ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1', '33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444445', 149.00, 'completed'),
-    ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2', '33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444446', 199.00, 'completed');
+    INSERT INTO orders.payments (id, user_id, course_id, amount, status, created_at) VALUES
+    ('2d11934c-2fd8-4696-b82c-b58a9c550610', '33333333-3333-3333-3333-333333333333', 'fad5123e-1652-43d6-b24a-5f033b1dbb79', 0.00, 'pending', '2026-05-20 14:48:20.499368'),
+    ('e4b6c3b9-ddd0-4ef9-a7d7-bd8412592830', '33333333-3333-3333-3333-333333333333', 'fad5123e-1652-43d6-b24a-5f033b1dbb79', 4.00, 'completed', '2026-05-20 14:52:00.687439'),
+    ('77ef1671-db7d-41b0-8eba-e6d2b0b5254e', 'd1ae305b-1cc4-41ea-9dbf-d7c7c3499db0', '44444444-4444-4444-4444-444444444445', 149.00, 'completed', '2026-05-21 06:32:35.551472'),
+    ('66ee5ac1-7416-4b1a-951a-4ec58f54849f', 'd1ae305b-1cc4-41ea-9dbf-d7c7c3499db0', 'fad5123e-1652-43d6-b24a-5f033b1dbb79', 4.00, 'completed', '2026-05-21 06:32:51.263587');
 
-    INSERT INTO enrollment.enrollments (id, user_id, course_id, status) VALUES 
-    ('88888888-8888-8888-8888-888888888888', '33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444444', 'active'),
-    ('88888888-8888-8888-8888-888888888889', '33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444445', 'active');
+    INSERT INTO enrollment.enrollments (id, user_id, course_id, status, enrolled_at) VALUES 
+    ('2fe1d65a-7f0e-486a-b87d-977731c27b7b', '33333333-3333-3333-3333-333333333333', 'fad5123e-1652-43d6-b24a-5f033b1dbb79', 'active', '2026-05-20 14:52:00.930694'),
+    ('a0404805-e5da-456a-a9c4-ce5cc17083e7', 'd1ae305b-1cc4-41ea-9dbf-d7c7c3499db0', '44444444-4444-4444-4444-444444444445', 'active', '2026-05-21 06:32:35.812561'),
+    ('8920ac0b-2a84-49a1-842d-c09d56d006d5', 'd1ae305b-1cc4-41ea-9dbf-d7c7c3499db0', 'fad5123e-1652-43d6-b24a-5f033b1dbb79', 'active', '2026-05-21 06:32:51.28801');
 
     -- USERS
-
     CREATE USER auth_user WITH PASSWORD '$AUTH_DB_PASSWORD';
     CREATE USER community_user WITH PASSWORD '$COMMUNITY_DB_PASSWORD';
     CREATE USER catalog_user WITH PASSWORD '$CATALOG_DB_PASSWORD';

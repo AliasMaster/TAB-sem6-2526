@@ -72,8 +72,13 @@
 
 /* --- SEKCJA PROGRAMU (SYLLABUS) --- */
 
+.course-detail-page-wrapper {
+  background-color: var(--bg-color);
+  min-height: 100vh;
+}
+
 .syllabus-section {
-  padding: 6rem 0;
+  padding: 6rem 0 10rem 0; /* Zwiększono odstęp na dole do 10rem przed stopką */
   display: grid;
   grid-template-columns: 1.7fr 1.3fr;
   gap: 5rem;

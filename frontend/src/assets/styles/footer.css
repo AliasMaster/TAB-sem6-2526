@@ -1,0 +1,255 @@
+/* --- PREMIUM FOOTER STYLES --- */
+
+.footer {
+  background-color: #0b0f19; /* Głęboki kosmiczny granat */
+  color: #94a3b8;
+  padding: 5rem 0 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  z-index: 10;
+}
+
+/* Subtelny blask u góry stopki */
+.footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.3), transparent);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  gap: 4rem;
+  margin-bottom: 4rem;
+}
+
+/* Lewa kolumna - Logo & Opis */
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.footer-logo {
+  font-size: 2.25rem;
+  font-weight: 900;
+  text-decoration: none;
+  color: #ffffff;
+  letter-spacing: -1px;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.footer-logo span {
+  color: var(--accent);
+  background: linear-gradient(135deg, #fbbf24, var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.footer-logo:hover {
+  transform: scale(1.02);
+}
+
+.footer-desc {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #64748b;
+  max-width: 320px;
+}
+
+/* Socjale z mikro-animacjami */
+.footer-socials {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.social-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #cbd5e1;
+  text-decoration: none;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.social-icon:hover {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-5px) rotate(8deg);
+  box-shadow: 0 10px 20px rgba(245, 158, 11, 0.2);
+}
+
+/* Kolumny Linków */
+.footer-links-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.footer-links-col h4 {
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.footer-links-col h4::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background-color: var(--accent);
+  border-radius: 2px;
+}
+
+.footer-links-col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.footer-links-col a {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.footer-links-col a:hover {
+  color: #ffffff;
+  transform: translateX(6px);
+}
+
+.footer-links-col a::before {
+  content: "→";
+  display: inline-block;
+  opacity: 0;
+  margin-right: -10px;
+  transition: all 0.3s ease;
+  color: var(--accent);
+}
+
+.footer-links-col a:hover::before {
+  opacity: 1;
+  margin-right: 6px;
+}
+
+/* Kolumna Kontaktowa (Subtelny szklany kartonik) */
+.footer-contact-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  backdrop-filter: blur(10px);
+}
+
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.contact-icon {
+  color: var(--accent);
+  font-size: 1.1rem;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.contact-text {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #cbd5e1;
+}
+
+.contact-text a {
+  color: #cbd5e1;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.contact-text a:hover {
+  color: var(--accent);
+}
+
+/* Dolna sekcja praw autorskich */
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.copyright {
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.footer-bottom-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.footer-bottom-links a {
+  color: #64748b;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.footer-bottom-links a:hover {
+  color: #cbd5e1;
+}
+
+/* Responsywność */
+@media (max-width: 1024px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .footer {
+    padding: 4rem 0 2rem;
+  }
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  .footer-bottom {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+}

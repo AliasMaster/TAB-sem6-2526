@@ -30,13 +30,13 @@ const Register = () => {
 
     try {
       await api.post('/auth/register', {
-        login: username,
+        username: username,
         password: password
       });
 
       // Zaloguj od razu po rejestracji
       const response = await api.post('/auth/login', {
-        login: username,
+        username: username,
         password: password
       });
 

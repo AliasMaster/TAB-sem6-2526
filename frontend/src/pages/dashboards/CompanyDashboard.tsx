@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../../api';
 import MDEditor from '@uiw/react-md-editor';
+import { useAuth } from '../../context/AuthContext';
 
 interface Course {
   id: string;
@@ -25,7 +26,7 @@ interface Material {
 
 export default function CompanyDashboard() {
   const [courses, setCourses] = useState<Course[]>([]);
-  const [newCourse, setNewCourse] = useState({ title: '', description: '', price: 0, imageUrl: '' });
+  const [newCourse, setNewCourse] = useState({ title: '', description: '', price: '' as any, imageUrl: '' });
   
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [materials, setMaterials] = useState<Material[]>([]);
@@ -39,34 +40,34 @@ export default function CompanyDashboard() {
   const editFileInputRef = useRef<HTMLInputElement>(null);
 
   const [reports, setReports] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<'courses' | 'sales'>('courses');
 
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, isLoading } = useAuth();
+  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
-    fetchUserAndData();
-  }, []);
+    if (isLoading) return;
+    
+    if (!user || user.role !== 'Company') {
+      window.location.href = '/';
+      return;
+    }
+    
+    fetchData();
+  }, [user, isLoading]);
 
-  const fetchUserAndData = async () => {
+  const fetchData = async () => {
     try {
-      const uRes = await api.get('/identity/users/me');
-      setUser(uRes.data);
-      if (uRes.data.role !== 'Company') {
-        window.location.href = '/';
-        return;
-      }
-      
       const cRes = await api.get('/catalog/courses');
-      const allCourses = cRes.data.rows || [];
-      const myCourses = allCourses.filter((c: any) => c.authorId?.toLowerCase() === uRes.data.id?.toLowerCase());
+      const allCourses = Array.isArray(cRes.data) ? cRes.data : (cRes.data?.rows || []);
+      const myCourses = allCourses.filter((c: any) => c.authorId?.toLowerCase() === user?.id?.toLowerCase());
       setCourses(myCourses);
 
       fetchReports();
     } catch (err) {
       console.error(err);
-      window.location.href = '/login';
     } finally {
-      setLoading(false);
+      setDataLoading(false);
     }
   };
 
@@ -82,9 +83,10 @@ export default function CompanyDashboard() {
   const handleCreateCourse = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await api.post('/catalog/courses', newCourse);
+      const priceNum = parseFloat(newCourse.price as any) || 0;
+      const res = await api.post('/catalog/courses', { ...newCourse, price: priceNum, status: 0 });
       setCourses([...courses, res.data]);
-      setNewCourse({ title: '', description: '', price: 0, imageUrl: '' });
+      setNewCourse({ title: '', description: '', price: '' as any, imageUrl: '' });
     } catch (err) {
       console.error(err);
     }
@@ -145,16 +147,17 @@ export default function CompanyDashboard() {
     e.preventDefault();
     if (!editingCourse) return;
     try {
+      const priceNum = parseFloat(editingCourse.price as any) || 0;
       await api.put(`/catalog/courses/${editingCourse.id}`, {
         title: editingCourse.title,
         description: editingCourse.description,
-        price: editingCourse.price,
+        price: priceNum,
         imageUrl: editingCourse.imageUrl,
         status: (editingCourse.status === 0 || editingCourse.status === 'Active' || editingCourse.status === '0') ? 0 : 1
       });
-      setCourses(courses.map(c => c.id === editingCourse.id ? editingCourse : c));
+      setCourses(courses.map(c => c.id === editingCourse.id ? { ...editingCourse, price: priceNum } : c));
       if (selectedCourse?.id === editingCourse.id) {
-        setSelectedCourse(editingCourse);
+        setSelectedCourse({ ...editingCourse, price: priceNum });
       }
       setEditingCourse(null);
     } catch (err) {
@@ -217,6 +220,51 @@ export default function CompanyDashboard() {
     }
   };
 
+  const moveMaterial = async (materialId: string, direction: number) => {
+    if (!selectedCourse) return;
+    const currentIndex = materials.findIndex(m => m.id === materialId);
+    if (currentIndex < 0) return;
+    
+    const newIndex = currentIndex + direction;
+    if (newIndex < 0 || newIndex >= materials.length) return;
+
+    const currentMaterial = materials[currentIndex];
+    const swapMaterial = materials[newIndex];
+
+    const currentOrder = currentMaterial.order !== undefined ? currentMaterial.order : currentMaterial.orderIndex;
+    const swapOrder = swapMaterial.order !== undefined ? swapMaterial.order : swapMaterial.orderIndex;
+
+    try {
+      // Aktualizacja w locie
+      const newMaterials = [...materials];
+      newMaterials[currentIndex] = { ...currentMaterial, order: swapOrder, orderIndex: swapOrder };
+      newMaterials[newIndex] = { ...swapMaterial, order: currentOrder, orderIndex: currentOrder };
+      newMaterials.sort((a, b) => {
+        const orderA = a.order !== undefined ? a.order : a.orderIndex;
+        const orderB = b.order !== undefined ? b.order : b.orderIndex;
+        return orderA - orderB;
+      });
+      setMaterials(newMaterials);
+
+      await api.put(`/catalog/courses/${selectedCourse.id}/materials/${currentMaterial.id}`, {
+        title: currentMaterial.title,
+        contentUrl: currentMaterial.contentUrl || '',
+        order: swapOrder
+      });
+
+      await api.put(`/catalog/courses/${selectedCourse.id}/materials/${swapMaterial.id}`, {
+        title: swapMaterial.title,
+        contentUrl: swapMaterial.contentUrl || '',
+        order: currentOrder
+      });
+    } catch (err) {
+      console.error("Failed to move material:", err);
+      // Rollback na wypadek błędu
+      const res = await api.get(`/catalog/courses/${selectedCourse.id}/materials`);
+      setMaterials(res.data || []);
+    }
+  };
+
   const toggleCourseStatus = async (course: Course) => {
     try {
       const newStatus = (course.status === 0 || course.status === 'Active' || course.status === '0') ? 1 : 0;
@@ -233,7 +281,7 @@ export default function CompanyDashboard() {
     }
   };
 
-  if (loading) {
+  if (isLoading || dataLoading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#0f172a' }}>
         <div style={{ width: '50px', height: '50px', border: '5px solid rgba(255,255,255,0.1)', borderTopColor: '#f59e0b', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
@@ -260,7 +308,31 @@ export default function CompanyDashboard() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '2rem', marginTop: '2rem', flexDirection: 'row', flexWrap: 'wrap' }}>
+        {/* TABS */}
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', borderBottom: '1px solid #334155', paddingBottom: '0' }}>
+          {(['courses', 'sales'] as const).map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+                padding: '0.75rem 1.5rem',
+                borderRadius: '10px 10px 0 0',
+                border: 'none',
+                cursor: 'pointer',
+                fontWeight: 600,
+                fontSize: '1rem',
+                transition: 'all 0.2s',
+                background: activeTab === tab ? 'rgba(245,158,11,0.15)' : 'transparent',
+                color: activeTab === tab ? '#f59e0b' : '#94a3b8',
+                borderBottom: activeTab === tab ? '2px solid #f59e0b' : '2px solid transparent',
+              }}
+            >
+              {tab === 'courses' ? '📚 Kursy i Lekcje' : '📊 Sprzedaż'}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === 'courses' && <div style={{ display: 'flex', gap: '2rem', flexDirection: 'row', flexWrap: 'wrap' }}>
           
           {/* LEWA KOLUMNA: Lista Kursów */}
           <div style={{ flex: '1', minWidth: '350px', backgroundColor: 'rgba(30, 41, 59, 0.7)', padding: '2rem', borderRadius: '20px', border: '1px solid #334155', backdropFilter: 'blur(10px)', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
@@ -270,14 +342,47 @@ export default function CompanyDashboard() {
               <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#cbd5e1' }}>Stwórz Nowy Kurs</h3>
               <input className="input" placeholder="Tytuł" value={newCourse.title} onChange={e => setNewCourse({...newCourse, title: e.target.value})} required style={{ padding: '0.8rem', borderRadius: '8px', backgroundColor: '#0f172a', border: '1px solid #475569', color: '#f1f5f9' }}/>
               <textarea className="input" placeholder="Opis" value={newCourse.description} onChange={e => setNewCourse({...newCourse, description: e.target.value})} required style={{ padding: '0.8rem', borderRadius: '8px', backgroundColor: '#0f172a', border: '1px solid #475569', color: '#f1f5f9', minHeight: '80px' }}/>
-              <input className="input" type="number" placeholder="Cena (PLN)" value={newCourse.price} onChange={e => setNewCourse({...newCourse, price: parseFloat(e.target.value)})} required style={{ padding: '0.8rem', borderRadius: '8px', backgroundColor: '#0f172a', border: '1px solid #475569', color: '#f1f5f9' }}/>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                <label style={{ fontSize: '0.85rem', color: '#cbd5e1', fontWeight: 600 }}>Cena kursu</label>
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                  <input 
+                    className="input" 
+                    type="text" 
+                    inputMode="decimal"
+                    placeholder="0.00" 
+                    value={newCourse.price} 
+                    onChange={e => {
+                      const val = e.target.value;
+                      if (val === '' || /^\d*[.,]?\d*$/.test(val)) {
+                        const normalized = val.replace(',', '.');
+                        setNewCourse({...newCourse, price: normalized});
+                      }
+                    }} 
+                    required 
+                    style={{ 
+                      width: '100%',
+                      padding: '0.8rem 3rem 0.8rem 1rem', 
+                      borderRadius: '8px', 
+                      backgroundColor: '#0f172a', 
+                      border: '1px solid #475569', 
+                      color: '#f1f5f9',
+                      fontSize: '1rem',
+                      outline: 'none',
+                      transition: 'border-color 0.2s'
+                    }}
+                  />
+                  <span style={{ position: 'absolute', right: '12px', color: '#94a3b8', fontWeight: 600, fontSize: '0.9rem', pointerEvents: 'none' }}>
+                    PLN
+                  </span>
+                </div>
+              </div>
               <input className="input" placeholder="URL Miniaturki" value={newCourse.imageUrl} onChange={e => setNewCourse({...newCourse, imageUrl: e.target.value})} style={{ padding: '0.8rem', borderRadius: '8px', backgroundColor: '#0f172a', border: '1px solid #475569', color: '#f1f5f9' }}/>
               <button type="submit" style={{ padding: '0.8rem', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: 'white', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
                 Dodaj Kurs
               </button>
             </form>
 
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '60vh', overflowY: 'auto', paddingRight: '4px' }}>
               {courses.map(course => (
                 <li 
                   key={course.id} 
@@ -307,7 +412,7 @@ export default function CompanyDashboard() {
                   </div>
                   
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '1rem' }}>
-                    {course.authorId?.toLowerCase() === user.id?.toLowerCase() && (
+                    {user.role === 'Company' && course.authorId?.toLowerCase() === user.id?.toLowerCase() && (
                       <>
                         <button 
                           onClick={(e) => { e.stopPropagation(); setEditingCourse(course); setEditingMaterial(null); }} 
@@ -358,8 +463,26 @@ export default function CompanyDashboard() {
                           </div>
                         </div>
                         
-                        {selectedCourse.authorId?.toLowerCase() === user.id?.toLowerCase() && (
+                        {user.role === 'Company' && selectedCourse.authorId?.toLowerCase() === user.id?.toLowerCase() && (
                           <div style={{ display: 'flex', gap: '8px' }}>
+                            <button
+                              onClick={() => moveMaterial(m.id, -1)}
+                              style={{ padding: '6px', borderRadius: '6px', border: 'none', backgroundColor: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', cursor: 'pointer', transition: 'all 0.2s', fontWeight: 600 }}
+                              onMouseOver={e => e.currentTarget.style.backgroundColor = 'rgba(148, 163, 184, 0.3)'}
+                              onMouseOut={e => e.currentTarget.style.backgroundColor = 'rgba(148, 163, 184, 0.15)'}
+                              title="Przesuń w górę"
+                            >
+                              ↑
+                            </button>
+                            <button
+                              onClick={() => moveMaterial(m.id, 1)}
+                              style={{ padding: '6px', borderRadius: '6px', border: 'none', backgroundColor: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', cursor: 'pointer', transition: 'all 0.2s', fontWeight: 600 }}
+                              onMouseOver={e => e.currentTarget.style.backgroundColor = 'rgba(148, 163, 184, 0.3)'}
+                              onMouseOut={e => e.currentTarget.style.backgroundColor = 'rgba(148, 163, 184, 0.15)'}
+                              title="Przesuń w dół"
+                            >
+                              ↓
+                            </button>
                             <button 
                               onClick={() => {
                                 setEditingMaterial({
@@ -395,7 +518,7 @@ export default function CompanyDashboard() {
                   )}
                 </ul>
 
-                {selectedCourse.authorId?.toLowerCase() === user.id?.toLowerCase() && (
+                {user.role === 'Company' && selectedCourse.authorId?.toLowerCase() === user.id?.toLowerCase() && (
                   <div style={{ marginTop: '2.5rem', backgroundColor: 'rgba(15, 23, 42, 0.4)', padding: '2rem', borderRadius: '15px', border: '1px solid #1e293b' }}>
                     <h3 style={{ margin: '0 0 1.5rem 0', color: '#f1f5f9', fontSize: '1.4rem' }}>✨ Dodaj Nową Lekcję</h3>
                     <form onSubmit={handleCreateMaterial} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -446,10 +569,10 @@ export default function CompanyDashboard() {
               </div>
             )}
           </div>
-        </div>
+        </div>}
 
-        {/* ZANONIMIZOWANE RAPORTY */}
-        <section style={{ marginTop: '3rem', backgroundColor: 'rgba(30, 41, 59, 0.7)', padding: '2rem', borderRadius: '20px', border: '1px solid #334155', backdropFilter: 'blur(10px)', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
+        {activeTab === 'sales' && (
+        <section style={{ backgroundColor: 'rgba(30, 41, 59, 0.7)', padding: '2rem', borderRadius: '20px', border: '1px solid #334155', backdropFilter: 'blur(10px)', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
           <h2 style={{ margin: '0 0 1.5rem 0', color: '#f1f5f9', fontSize: '1.8rem' }}>📊 Sprzedaż Twoich Kursów (Cały Okres)</h2>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
@@ -476,6 +599,7 @@ export default function CompanyDashboard() {
             </table>
           </div>
         </section>
+        )}
 
       </div> {/* ZAMKNIĘCIE .container */}
 
@@ -548,8 +672,37 @@ export default function CompanyDashboard() {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <label style={{ fontSize: '0.9rem', color: '#9ca3af' }}>Cena (PLN)</label>
-                  <input className="input" type="number" placeholder="Cena" value={editingCourse.price} onChange={e => setEditingCourse({...editingCourse, price: parseFloat(e.target.value)})} required style={{ padding: '0.8rem', borderRadius: '8px' }}/>
+                  <label style={{ fontSize: '0.9rem', color: '#cbd5e1', fontWeight: 600 }}>Cena</label>
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    <input 
+                      className="input" 
+                      type="text" 
+                      inputMode="decimal"
+                      placeholder="0.00" 
+                      value={editingCourse.price} 
+                      onChange={e => {
+                        const val = e.target.value;
+                        if (val === '' || /^\d*[.,]?\d*$/.test(val)) {
+                          const normalized = val.replace(',', '.');
+                          setEditingCourse({...editingCourse, price: normalized as any});
+                        }
+                      }} 
+                      required 
+                      style={{ 
+                        width: '100%',
+                        padding: '0.8rem 3rem 0.8rem 1rem', 
+                        borderRadius: '8px',
+                        backgroundColor: '#0f172a',
+                        border: '1px solid #475569',
+                        color: '#f1f5f9',
+                        fontSize: '1rem',
+                        outline: 'none'
+                      }}
+                    />
+                    <span style={{ position: 'absolute', right: '12px', color: '#cbd5e1', fontWeight: 600, fontSize: '0.9rem', pointerEvents: 'none' }}>
+                      PLN
+                    </span>
+                  </div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <label style={{ fontSize: '0.9rem', color: '#9ca3af' }}>Status</label>

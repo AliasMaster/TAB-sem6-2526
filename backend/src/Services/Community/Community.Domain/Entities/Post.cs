@@ -11,4 +11,5 @@ public class Post
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public Thread? Thread { get; set; }
+    public AuthUser? Author { get; set; }
 }

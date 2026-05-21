@@ -24,18 +24,29 @@ public class ThreadsController : ControllerBase
     public async Task<IActionResult> GetThreads(CancellationToken ct)
     {
         var threads = await _db.Threads
+            .Include(t => t.Author)
             .OrderByDescending(t => t.CreatedAt)
-            .Select(t => new { t.Id, t.Title, t.Category, t.AuthorId, t.CreatedAt })
             .ToListAsync(ct);
 
-        return Ok(threads);
+        var result = threads.Select(t => new { 
+                t.Id, 
+                t.Title, 
+                t.Category, 
+                t.AuthorId, 
+                AuthorName = t.Author != null ? t.Author.Login : "Nieznany", 
+                t.CreatedAt 
+            });
+
+        return Ok(result);
     }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetThread([FromRoute] Guid id, CancellationToken ct)
     {
         var thread = await _db.Threads
+            .Include(t => t.Author)
             .Include(t => t.Posts)
+                .ThenInclude(p => p.Author)
             .FirstOrDefaultAsync(t => t.Id == id, ct);
 
         if (thread == null) return NotFound();
@@ -47,12 +58,14 @@ public class ThreadsController : ControllerBase
             thread.Content,
             thread.Category,
             thread.AuthorId,
+            AuthorName = thread.Author != null ? thread.Author.Login : "Nieznany",
             thread.CreatedAt,
             Posts = thread.Posts.OrderBy(p => p.CreatedAt).Select(p => new
             {
                 p.Id,
                 p.Content,
                 p.AuthorId,
+                AuthorName = p.Author != null ? p.Author.Login : "Nieznany",
                 p.CreatedAt
             })
         };

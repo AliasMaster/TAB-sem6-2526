@@ -29,10 +29,7 @@ public static class DependencyInjection
 
         services.AddDbContext<CatalogDbContext>(options =>
         {
-            options.UseNpgsql(connectionString, npgsqlOptions =>
-            {
-                npgsqlOptions.MapEnum<CourseStatus>("course_status");
-            });
+            options.UseNpgsql(connectionString);
         });
 
         services.AddScoped<ICourseRepository, CourseRepository>();
