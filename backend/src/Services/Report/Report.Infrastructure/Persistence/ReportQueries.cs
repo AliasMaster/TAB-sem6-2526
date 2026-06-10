@@ -74,6 +74,7 @@ public class ReportQueries : IReportQueries
                AND e.status = 'active'
                AND ({3}::uuid IS NULL OR e.course_id IN (SELECT id FROM catalog.courses WHERE author_id = {3}::uuid))
             WHERE ({2}::uuid IS NULL OR u.id = {2}::uuid)
+              AND u.role != 'company'
               AND ({3}::uuid IS NULL OR u.id IN (
                   SELECT user_id FROM enrollment.enrollments e_sub
                   JOIN catalog.courses c_sub ON c_sub.id = e_sub.course_id

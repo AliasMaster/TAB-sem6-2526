@@ -5,11 +5,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.Limits.MaxRequestBodySize = null; // Unlimited
+    options.Limits.MaxRequestBodySize = 10L * 1024 * 1024 * 1024; // 10 GB
 });
 builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
 {
-    options.MultipartBodyLengthLimit = long.MaxValue; // Unlimited
+    options.MultipartBodyLengthLimit = 10L * 1024 * 1024 * 1024; // 10 GB
 });
 
 builder.Services.AddOpenApi();

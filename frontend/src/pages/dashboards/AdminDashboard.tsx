@@ -46,6 +46,9 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'sales' | 'activity' | 'course-activity' | 'courses'>('overview');
 
+  const [salesCourseTitle, setSalesCourseTitle] = useState('');
+  const [activityUsername, setActivityUsername] = useState('');
+
   // Default dates: start of year to end of year for demo
   const [startDate, setStartDate] = useState(new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0]);
   const [endDate, setEndDate] = useState(new Date(new Date().getFullYear(), 11, 31).toISOString().split('T')[0]);
@@ -58,10 +61,14 @@ export default function AdminDashboard() {
     setLoading(true);
     setError(null);
     try {
+      // Find courseId if title matches
+      const selectedCourseForSales = courses.find(c => c.title === salesCourseTitle);
+      const courseIdParam = selectedCourseForSales ? `&courseId=${selectedCourseForSales.id}` : '';
+
       const [coursesRes, activityRes, salesRes, courseActivityRes] = await Promise.all([
         api.get('/catalog/courses'),
         api.get(`/reports/user-activity?startDate=${startDate}&endDate=${endDate}`),
-        api.get(`/reports/course-sales?startDate=${startDate}&endDate=${endDate}`),
+        api.get(`/reports/course-sales?startDate=${startDate}&endDate=${endDate}${courseIdParam}`),
         api.get(`/reports/course-activity?startDate=${startDate}&endDate=${endDate}`),
       ]);
       setCourses(coursesRes.data || []);
@@ -107,6 +114,10 @@ export default function AdminDashboard() {
     );
   }
 
+  const displayedActivities = activityUsername
+    ? activities.filter(a => a.username.toLowerCase().includes(activityUsername.toLowerCase()))
+    : activities;
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#0f172a', color: 'white', paddingTop: '100px', paddingBottom: '4rem' }}>
       <div className="container">
@@ -129,6 +140,36 @@ export default function AdminDashboard() {
               <label style={{ fontSize: '0.8rem', color: '#94a3b8', marginBottom: '0.25rem', fontWeight: 600, textTransform: 'uppercase' }}>Do daty</label>
               <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} style={{ padding: '0.6rem', borderRadius: '8px', border: '1px solid #475569', background: '#0f172a', color: 'white', outline: 'none' }} />
             </div>
+            {activeTab === 'sales' && (
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <label style={{ fontSize: '0.8rem', color: '#94a3b8', marginBottom: '0.25rem', fontWeight: 600, textTransform: 'uppercase' }}>Kurs (Sprzedaż)</label>
+                <input 
+                  list="courses-list" 
+                  placeholder="Wszystkie kursy"
+                  value={salesCourseTitle} 
+                  onChange={e => setSalesCourseTitle(e.target.value)} 
+                  style={{ padding: '0.6rem', borderRadius: '8px', border: '1px solid #475569', background: '#0f172a', color: 'white', outline: 'none', width: '200px' }} 
+                />
+                <datalist id="courses-list">
+                  {courses.map(c => <option key={c.id} value={c.title} />)}
+                </datalist>
+              </div>
+            )}
+            {activeTab === 'activity' && (
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <label style={{ fontSize: '0.8rem', color: '#94a3b8', marginBottom: '0.25rem', fontWeight: 600, textTransform: 'uppercase' }}>Użytkownik (Aktywność)</label>
+                <input 
+                  list="users-list" 
+                  placeholder="Wszyscy użytkownicy"
+                  value={activityUsername} 
+                  onChange={e => setActivityUsername(e.target.value)} 
+                  style={{ padding: '0.6rem', borderRadius: '8px', border: '1px solid #475569', background: '#0f172a', color: 'white', outline: 'none', width: '200px' }} 
+                />
+                <datalist id="users-list">
+                  {activities.map(a => <option key={a.userId} value={a.username} />)}
+                </datalist>
+              </div>
+            )}
             <button onClick={fetchData} style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #6366f1, #a855f7)', color: 'white', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
               Aktualizuj
             </button>
@@ -259,10 +300,10 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {activities.length === 0 ? (
-                    <tr><td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>Brak aktywności w wybranym okresie.</td></tr>
+                  {displayedActivities.length === 0 ? (
+                    <tr><td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>Brak aktywności w wybranym okresie dla podanego użytkownika.</td></tr>
                   ) : (
-                    activities.map((row, i) => (
+                    displayedActivities.map((row, i) => (
                       <tr key={i} style={{ borderBottom: '1px solid #1e293b', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
                         <td style={{ padding: '1rem', color: '#f1f5f9', fontWeight: 500 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

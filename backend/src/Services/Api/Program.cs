@@ -5,6 +5,11 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 10L * 1024 * 1024 * 1024; // 10 GB
+});
+
 var jwtSecret = builder.Configuration["Jwt__Secret"]
     ?? builder.Configuration["Jwt:Secret"]
     ?? "YourSuperSecretKeyThatIsAtLeast32CharactersLong_ChangeInProduction!";

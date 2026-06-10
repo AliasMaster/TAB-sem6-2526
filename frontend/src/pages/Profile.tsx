@@ -91,46 +91,48 @@ const Profile = () => {
             </div>
           </div>
 
-          <div className="profile-card" style={{ gridRow: 'span 2' }}>
-            <h3 className="card-title">Twoje Kursy</h3>
-            {enrollments.length > 0 ? (
-              <ul style={{ listStyle: 'none', padding: 0 }}>
-                {enrollments.map(e => (
-                  <li key={e.id} style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid #e2e8f0' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontWeight: 'bold' }}>Zapisany dnia: {new Date(e.enrolledAt).toLocaleDateString()}</span>
-                      <Link to={`/lesson/${e.courseId}`} className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}>Ucz się</Link>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>Brak zapisów na kursy.</p>
-            )}
-            
-            <h3 className="card-title" style={{ marginTop: '2rem' }}>Historia Płatności</h3>
-            {orders.length > 0 ? (
-              <ul style={{ listStyle: 'none', padding: 0 }}>
-                {orders.map(o => (
-                  <li key={o.id} style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid #e2e8f0' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div>
-                        <strong>Kwota: {o.amount} PLN</strong><br />
-                        <small>Status: {o.status} | Data: {new Date(o.createdAt).toLocaleDateString()}</small>
+          {user?.role !== 'Company' && (
+            <div className="profile-card" style={{ gridRow: 'span 2' }}>
+              <h3 className="card-title">Twoje Kursy</h3>
+              {enrollments.length > 0 ? (
+                <ul style={{ listStyle: 'none', padding: 0 }}>
+                  {enrollments.map(e => (
+                    <li key={e.id} style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid #e2e8f0' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 'bold' }}>Zapisany dnia: {new Date(e.enrolledAt).toLocaleDateString()}</span>
+                        <Link to={`/lesson/${e.courseId}`} className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}>Ucz się</Link>
                       </div>
-                      {o.status === 'Completed' && (
-                        <button className="btn btn-login" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }} onClick={() => handleRefund(o.id)}>
-                          Zwrot (do 14 dni)
-                        </button>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>Brak historii płatności.</p>
-            )}
-          </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>Brak zapisów na kursy.</p>
+              )}
+              
+              <h3 className="card-title" style={{ marginTop: '2rem' }}>Historia Płatności</h3>
+              {orders.length > 0 ? (
+                <ul style={{ listStyle: 'none', padding: 0 }}>
+                  {orders.map(o => (
+                    <li key={o.id} style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid #e2e8f0' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <strong>Kwota: {o.amount} PLN</strong><br />
+                          <small>Status: {o.status} | Data: {new Date(o.createdAt).toLocaleDateString()}</small>
+                        </div>
+                        {o.status === 'Completed' && (
+                          <button className="btn btn-login" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }} onClick={() => handleRefund(o.id)}>
+                            Zwrot (do 14 dni)
+                          </button>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>Brak historii płatności.</p>
+              )}
+            </div>
+          )}
 
         </div>
       </section>

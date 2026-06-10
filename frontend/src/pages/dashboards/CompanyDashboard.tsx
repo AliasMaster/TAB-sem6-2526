@@ -45,6 +45,8 @@ export default function CompanyDashboard() {
   const { user, isLoading } = useAuth();
   const [dataLoading, setDataLoading] = useState(true);
 
+  const [salesCourseTitle, setSalesCourseTitle] = useState('');
+
   useEffect(() => {
     if (isLoading) return;
     
@@ -63,7 +65,8 @@ export default function CompanyDashboard() {
       const myCourses = allCourses.filter((c: any) => c.authorId?.toLowerCase() === user?.id?.toLowerCase());
       setCourses(myCourses);
 
-      fetchReports();
+      // fetchReports uses myCourses to find the selected course
+      fetchReports(myCourses);
     } catch (err) {
       console.error(err);
     } finally {
@@ -71,9 +74,11 @@ export default function CompanyDashboard() {
     }
   };
 
-  const fetchReports = async () => {
+  const fetchReports = async (currentCourses: Course[] = courses) => {
     try {
-      const res = await api.get('/reports/course-sales?startDate=2020-01-01&endDate=2030-01-01');
+      const selectedCourseForSales = currentCourses.find(c => c.title === salesCourseTitle);
+      const courseIdParam = selectedCourseForSales ? `&courseId=${selectedCourseForSales.id}` : '';
+      const res = await api.get(`/reports/course-sales?startDate=2020-01-01&endDate=2030-01-01${courseIdParam}`);
       setReports(res.data.rows || []);
     } catch (err) {
       console.error(err);
@@ -573,7 +578,32 @@ export default function CompanyDashboard() {
 
         {activeTab === 'sales' && (
         <section style={{ backgroundColor: 'rgba(30, 41, 59, 0.7)', padding: '2rem', borderRadius: '20px', border: '1px solid #334155', backdropFilter: 'blur(10px)', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
-          <h2 style={{ margin: '0 0 1.5rem 0', color: '#f1f5f9', fontSize: '1.8rem' }}>📊 Sprzedaż Twoich Kursów (Cały Okres)</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+            <h2 style={{ margin: 0, color: '#f1f5f9', fontSize: '1.8rem' }}>📊 Sprzedaż Twoich Kursów (Cały Okres)</h2>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', background: 'rgba(15, 23, 42, 0.8)', padding: '1rem', borderRadius: '16px', border: '1px solid #475569' }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <label style={{ fontSize: '0.8rem', color: '#94a3b8', marginBottom: '0.25rem', fontWeight: 600, textTransform: 'uppercase' }}>Filtruj wg kursu</label>
+                <input 
+                  list="company-courses-list" 
+                  placeholder="Wszystkie kursy"
+                  value={salesCourseTitle} 
+                  onChange={e => setSalesCourseTitle(e.target.value)} 
+                  style={{ padding: '0.6rem', borderRadius: '8px', border: '1px solid #475569', background: '#0f172a', color: 'white', outline: 'none', width: '220px' }} 
+                />
+                <datalist id="company-courses-list">
+                  {courses.map(c => <option key={c.id} value={c.title} />)}
+                </datalist>
+              </div>
+              <button 
+                onClick={() => fetchReports()} 
+                style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #f59e0b, #ec4899)', color: 'white', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)' }} 
+                onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'} 
+                onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                Aktualizuj
+              </button>
+            </div>
+          </div>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>

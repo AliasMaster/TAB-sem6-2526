@@ -15,6 +15,8 @@ import AdminDashboard from './pages/dashboards/AdminDashboard';
 import CompanyDashboard from './pages/dashboards/CompanyDashboard';
 import { AuthProvider } from './context/AuthContext';
 
+import RestrictCompany from './components/RestrictCompany';
+
 function App() {
   return (
     <AuthProvider>
@@ -23,9 +25,9 @@ function App() {
 
         <main>
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/catalog" element={<CoursePage />} />
-            <Route path="/community" element={<Community />} />
+            <Route path="/" element={<RestrictCompany><HomePage /></RestrictCompany>} />
+            <Route path="/catalog" element={<RestrictCompany><CoursePage /></RestrictCompany>} />
+            <Route path="/community" element={<RestrictCompany><Community /></RestrictCompany>} />
 
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -33,15 +35,15 @@ function App() {
             <Route
               path="/lesson/:id"
               element={
-                <ProtectedRoute allowedRoles={['User', 'Admin', 'Company']}>
+                <ProtectedRoute allowedRoles={['User', 'Admin']}>
                   <LessonSection />
                 </ProtectedRoute>
               }
             />
 
-            <Route path="/course/:id" element={<CourseDetailPage />} />
+            <Route path="/course/:id" element={<RestrictCompany><CourseDetailPage /></RestrictCompany>} />
 
-            <Route path="/about" element={<About />} />
+            <Route path="/about" element={<RestrictCompany><About /></RestrictCompany>} />
 
             <Route
               path="/profile"

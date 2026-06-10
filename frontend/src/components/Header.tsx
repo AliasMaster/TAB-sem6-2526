@@ -15,22 +15,26 @@ export default function Header() {
 
         {/* NAWIGACJA ŚRODKOWA */}
         <nav className="nav-links">
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) => (isActive ? 'active' : '')}>
-            Start
-          </NavLink>
-          <NavLink
-            to="/catalog"
-            className={({ isActive }) => (isActive ? 'active' : '')}>
-            Katalog Kursów
-          </NavLink>
-          <NavLink
-            to="/community"
-            className={({ isActive }) => (isActive ? 'active' : '')}>
-            Forum
-          </NavLink>
+          {user?.role !== 'Company' && (
+            <>
+              <NavLink
+                to="/"
+                end
+                className={({ isActive }) => (isActive ? 'active' : '')}>
+                Start
+              </NavLink>
+              <NavLink
+                to="/catalog"
+                className={({ isActive }) => (isActive ? 'active' : '')}>
+                Katalog Kursów
+              </NavLink>
+              <NavLink
+                to="/community"
+                className={({ isActive }) => (isActive ? 'active' : '')}>
+                Forum
+              </NavLink>
+            </>
+          )}
 
           {user?.role === 'Admin' && (
             <NavLink
