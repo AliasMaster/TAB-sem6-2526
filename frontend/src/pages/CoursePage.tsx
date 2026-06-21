@@ -6,17 +6,6 @@ import '../assets/styles/catalog.css';
 export default function CoursePage() {
   const [courses, setCourses] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeCategory, setActiveCategory] = useState('Wszystkie');
-
-  const categories = [
-    'Wszystkie',
-    'Programowanie',
-    'Design',
-    'Biznes',
-    'Muzyka',
-    'Kulinaria',
-    'Zdrowie i Fitness',
-  ];
 
   useEffect(() => {
     fetchCourses();
@@ -35,7 +24,6 @@ export default function CoursePage() {
           author: 'Company ' + (c.authorId ? c.authorId.substring(0, 5) : ''), // Mocked author name for now
           price: c.price,
           imageUrl: c.imageUrl || 'https://via.placeholder.com/400x250',
-          category: 'Programowanie', // Mocked category since backend doesn't have it yet
           rating: c.averageRating || 0,
         }));
       setCourses(mappedCourses);
@@ -45,12 +33,10 @@ export default function CoursePage() {
   };
 
   const filteredCourses = courses.filter((course) => {
-    const matchesCategory =
-      activeCategory === 'Wszystkie' || course.category === activeCategory;
     const matchesSearch = course.title
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
+    return matchesSearch;
   });
 
   return (
@@ -65,17 +51,6 @@ export default function CoursePage() {
       <div className="container">
         {/* Pasek narzędziowy: Filtry i Szukajka */}
         <div className="catalog-controls">
-          <div className="filter-buttons">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                className={`filter-btn ${activeCategory === cat ? 'active' : ''}`}
-                onClick={() => setActiveCategory(cat)}>
-                {cat}
-              </button>
-            ))}
-          </div>
-
           <div className="catalog-search">
             {/* Ikona lupki SVG */}
             <svg
@@ -127,12 +102,11 @@ export default function CoursePage() {
               <line x1="8" y1="11" x2="14" y2="11"></line>
             </svg>
             <h3>Brak wyników</h3>
-            <p>Spróbuj wpisać inne hasło lub zmień kategorię wyszukiwania.</p>
+            <p>Spróbuj wpisać inne hasło wyszukiwania.</p>
             <button
               className="btn btn-primary"
               onClick={() => {
                 setSearchTerm('');
-                setActiveCategory('Wszystkie');
               }}>
               Wyczyść filtry
             </button>

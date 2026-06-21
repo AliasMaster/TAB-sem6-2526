@@ -101,7 +101,7 @@ export default function LessonSection() {
   const markCompleted = async () => {
     if (!activeLesson) return;
     try {
-      await api.post(`/enrollments/course/${id}/lessons/${activeLesson.id}/progress`);
+      await api.post(`/enrollments/course/${id}/lessons/${activeLesson.id}/complete`);
       const progRes = await api.get(`/enrollments/course/${id}/progress`);
       setProgress(progRes.data);
       

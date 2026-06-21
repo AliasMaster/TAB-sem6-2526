@@ -176,7 +176,7 @@ export default function CompanyDashboard() {
 
     try {
       const updatedTitle = `[${editingMaterial.type}] ${editingMaterial.title}`;
-      const updatedContentUrl = editingMaterial.type === 'Text' ? editingMaterial.content : '';
+      const updatedContentUrl = editingMaterial.type === 'Text' ? editingMaterial.content : (editingMaterial.contentUrl || '');
 
       await api.put(`/catalog/courses/${selectedCourse.id}/materials/${editingMaterial.id}`, {
         title: updatedTitle,
